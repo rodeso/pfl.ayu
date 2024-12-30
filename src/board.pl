@@ -113,8 +113,8 @@ display_board([Line | Others], N, NT):-
     display_board(Others, X, NT).
 
 % Displays the whole board
-display_general(B):- 
+display_game(B):- 
     length(B, N),
     display_board(B, N, N), nl,
     write('   '),
-    display_col_num(N, 1).
+    display_col_num(N, 1), nl.
