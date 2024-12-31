@@ -26,7 +26,7 @@ game_loop(GameState):-
     choose_move(S, XT, YT, XI, YI), % neste momento esta função apenas retorna a peça a tirar e a peça a por
     % TODO move -> The actual move
     % TODO troca o player para o proximo
-    game_loop(NewGameState). % recusão - mandar o NewGameState que é o GameState inicial mas adaptado
+    game_loop(NewGameState). % recursão - mandar o NewGameState que é o GameState inicial mas adaptado
 
 set_up(T, S, B):-
     get_type_game(T), nl,

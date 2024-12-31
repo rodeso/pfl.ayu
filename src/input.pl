@@ -29,19 +29,16 @@ get_size(List, Context, Value):-
 
 type_game(1):-
     nl, 
-    write('Chosen game: Human vs Human'), nl,
+    write('Chosen game: Human vs Human'), nl.
     % players 1 & 2
-    .
 type_game(2):-
     nl,
-    write('Chosen game: Human vs Computer'), nl,
+    write('Chosen game: Human vs Computer'), nl.
     % players 1 & bot
-    .
 type_game(3):-
     nl,
-    write('Chosen game: Computer vs Computer'), nl,
+    write('Chosen game: Computer vs Computer'), nl.
     % bot & bot
-    .
 
 % Get type of game that will be played
 get_type_game(T):-
