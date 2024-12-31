@@ -1,80 +1,71 @@
-:- consult(board). % Functions to create and display the board
-:- consult(input). % Functions to receive all the inputs
+:- consult(board).    % Functions to create and display the board
+:- consult(input).    % Functions to receive all the inputs
+:- consult(player).   % Functions of all player related
+:- consult(end_game). % Functions to end game
+:- consult(logic).    % Functions of the game's logic
+:- consult(valid_moves).
 
-% GameState = [Board, CurrentPlayer,..] - ir escrevendo aqui para sabermos 
+% GameState = [Board, CurrentPlayer,TypeOfGame,...] - ir escrevendo aqui para sabermos 
+% GameConfig = [SizeBoard ,TypeOfGame, ...]
 
-% Recebe as coordenadas XT e YT for the pice to take out e as coordenadas XI e YI for were to insert the pice
-choose_move(B, S, XT, YT, XI, YI, CurrentPlayer):- % mudar para choose_move(+GameState, +Level, -Move) (ver descrição do prof)
-    write('Take piece from'), nl,
-    get_take_piece(S, XT, YT), nl,
-    % Validar se é uma peça do current player, se n mensagem de erro e voltar a pedir
-    check_piece(B, S, XT, YT, CurrentPlayer),
-    write('Add piece to:'), nl,
-    get_take_piece(S, XI, YI), nl
-    % Validar se n existe nenhuma peça neste spot e validar que é uma valid move para o current player
-    .
+% OBRIGATORIO
+% display_game(+GameState)
+% Displays the current board and the current player
+display_game([Board, CurrentPlayer, _]):-
+    display_board(Board), nl,
+    display_player(CurrentPlayer).
 
-% Main game loop - recursive
-%game_loop:-
-    % TODO game_over(+GameState, -Winner) - se der gameover ent print do winner e termina o jogo, se n vai para o outro game_loop
-    % game_over(+GameState, -Winner), !,
-    % display_game(+GameState),
-    % show_winner(+GameState, +Winner).
-% Game Loop
-game_loop(game_state(T, S, B)):-
-    % Display the board
-    display_game(B), nl,
 
-    % Check for type of game / if someone won
-    % Check if the game is over
-    (T = -1 -> write('Player 1 won!'), nl;
-     T = -2 -> write('Player 2 won!'), nl;
-     T = -3 -> write('Computer 1 won!'), nl;
-     T = -4 -> write('Computer 2 won!'), nl;
-     % Otherwise, process the turn
-     (T = 1 -> 
-         write('Player 1\'s' turn'), nl,
-         choose_move(B, S, XT, YT, XI, YI, x), nl,
-         write('Player 2\'s turn'), nl,
-         choose_move(B, S, XT, YT, XI, YI, o), nl;
-      T = 2 -> 
-         write('Player\'s turn'), nl,
-         choose_move(B, S, XT, YT, XI, YI, o), nl;
-      T = 3 ->
-         write('Computer 1\'s turn'), nl,
-         choose_move(B, S, XT, YT, XI, YI, x), nl,
-         write('Computer 2\'s turn'), nl,
-         choose_move(B, S, XT, YT, XI, YI), nl), 
-     
-     % Update the game state
-     check_gameover(B, T, NewT),
-     NewGameState = game_state(B, NewT),
 
-     % Recursive call
-     game_loop(NewGameState)
-    ).
+% game_loop(+GameState)
+% This is the main game loop
+game_loop([Board, Player, T]):- % If the game is over
+    game_over([Board, Player, T], Winner),
+    Winner \= none,
+    display_board(Board),
+    format('Game over! Winner: ~d', [Winner]).
+game_loop([Board, CurrentPlayer, T]):- % New turn
 
-% Placeholder for check_gameover/3
-check_gameover(B, T, NewT):-
-    % Logic to determine if the game is over
-    % Update NewT accordingly (-1, -2, or continue with 1, 2, 3)
-    NewT = -1.
+    display_game([Board, CurrentPlayer, T]), nl,
 
-set_up(T, S, B):-
-    get_type_game(T), nl,
-    get_size_game(S), nl,
-    board(S, B).             % Creates the board
+    choose_move([Board, CurrentPlayer, T], 0, Move),
 
-% Main
+    move([Board, CurrentPlayer, T], Move, NewGameState),
+
+    change_player(NewGameState, NextGameState),
+    
+    game_loop(NextGameState). % Recursive
+
+
+% set_up(-T, -S, -P)
+% Function to do the initial set up
+set_up(T, S, P):-
+    get_type_game(T), nl,      % input.pl
+    get_size_game(S), nl,      % input.pl
+    get_player_starts(P), nl.  % input.pl
+
+% OBRIGATORIO
+% initial_state(+GameConfig, -GameState).
+% This predicate receives a desired game configuration and returns the corresponding initial game state. 
+% Game configuration includes the type of each player and other parameters such as board size, use of optional rules, 
+% player names, or other information to provide more flexibility to the game. 
+% The game state describes a snapshot of the current game state, including board configuration 
+% (typically using list of lists with different atoms for the different pieces), identifies the current player (the one playing next),
+% and possibly captured pieces and/or pieces yet to be played, or any other information that may be required, depending on the game.
+initial_state([T, S, P], GameState):-
+    board(S, B),               % board.pl
+    % other things...
+    [B, P, T] = GameState.
+
+% OBRIGATORIO
 % T -> type of game being played (1-H/H, 2-H/C, 3-C/C)
 % S -> size of the board (5, 11, 13 or 15)
-% Main Function
+% P -> first player (1 or 2)
+% Main function that starts the game
 play:-
     % Set up the game
-    set_up(T, S, B),
-
-    % Initialize the game state
-    GameState = game_state(T, S, B),
-
+    set_up(T, S, P),
+    % Initial state
+    initial_state([T,S,P], GameState),
     % Start the game loop
     game_loop(GameState).

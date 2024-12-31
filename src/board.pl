@@ -1,6 +1,11 @@
 % 5x5 board (for testing)
-board(5, [[empty, x, empty, x, empty], 
+/*board(5, [[empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
+          [empty, x, empty, x, empty], 
+          [o, empty, o, empty, o], 
+          [empty, x, empty, x, empty]]).*/
+board(5, [[empty, x, x, x, empty], 
+          [o, o, o, empty, o], 
           [empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
           [empty, x, empty, x, empty]]).
@@ -103,18 +108,18 @@ display_row_number(N):-
     write('  | ').
 
 % Displays the board (without the numbers)
-display_board([], _, NT):- write('   '), display_line_div(NT, 1) , !.
-display_board([Line | Others], N, NT):-
+display_partial_board([], _, NT):- write('   '), display_line_div(NT, 1) , !.
+display_partial_board([Line | Others], N, NT):-
     write('   '),
     display_line_div(NT, 1), nl,
     display_row_number(N),
     display_line(Line),
     X is N-1,
-    display_board(Others, X, NT).
+    display_partial_board(Others, X, NT).
 
 % Displays the whole board
-display_game(B):- 
+display_board(B):- 
     length(B, N),
-    display_board(B, N, N), nl,
+    display_partial_board(B, N, N), nl,
     write('   '),
     display_col_num(N, 1), nl.

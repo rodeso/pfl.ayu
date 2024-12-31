@@ -54,6 +54,11 @@ get_size_game(S):-
     write('Size of board: 5, 11, 13, 15'), nl,
     get_size([5, 11, 13, 15], 'Input', S).
 
+% Get the player that will start
+get_player_starts(P):-
+    write('Which Player starts the game? (1 or 2)'), nl,
+    get_size([1, 2], 'Player', P).
+
 % Get place to add or remove piece
 get_take_piece(S, X, Y):-
     get_number(1, S, 'X cordenate:', X), nl,
