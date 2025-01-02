@@ -1,19 +1,20 @@
+:- use_module(library(lists)).
 % 5x5 board (for testing)
 /*board(5, [[empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
           [empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
           [empty, x, empty, x, empty]]).*/
-board(5, [[empty, x, x, x, empty], 
+board(5, [[empty, empty, x, x, empty], 
           [o, o, o, empty, o], 
-          [empty, x, empty, x, empty], 
-          [o, empty, o, empty, o], 
-          [empty, x, empty, x, empty]]).
+          [empty, empty, o, x, empty], 
+          [o, o, o, o, empty], 
+          [o, x, empty, o, empty]]).
 
 % 11x11 board
-board(11, [[empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
-          [o, empty, o, empty, o, empty, o, empty, o, empty, o], 
-          [empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
+board(11, [[empty, x, x, x, empty, empty, empty, x, empty, x, empty], 
+          [x, empty, o, empty, o, empty, o, empty, o, empty, o], 
+          [o, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],
           [empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],

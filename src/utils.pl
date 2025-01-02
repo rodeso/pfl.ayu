@@ -25,3 +25,15 @@ empty_at(Board, X, Y) :-
 
 % Checks if the pieces are the same
 same_type(Piece1, Piece2):- Piece1 == Piece2.
+
+get_board([Board, _, _], RetBoard):-
+    Board = RetBoard.
+
+% valid_one_move(+FromX, +FromY, +ToX, +ToY)
+% Ensure that the move for an isolated piece is exactly 1 square away
+valid_one_move(FromX, FromY, ToX, ToY) :-
+    DX is abs(ToX - FromX),
+    DY is abs(ToY - FromY),
+    (DX =:= 1, DY =:= 0;     % Move 1 square left or right
+     DX =:= 0, DY =:= 1).    % Move 1 square up or down
+

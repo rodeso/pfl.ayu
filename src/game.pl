@@ -1,9 +1,13 @@
+:- use_module(library(lists)).
 :- consult(board).    % Functions to create and display the board
 :- consult(input).    % Functions to receive all the inputs
 :- consult(player).   % Functions of all player related
 :- consult(end_game). % Functions to end game
 :- consult(logic).    % Functions of the game's logic
-:- consult(valid_moves).
+:- consult(clusters).
+:- consult(valid_move_final).
+:- consult(utils).
+
 
 % GameState = [Board, CurrentPlayer,TypeOfGame,...] - ir escrevendo aqui para sabermos 
 % GameConfig = [SizeBoard ,TypeOfGame, ...]
@@ -16,24 +20,26 @@ display_game([Board, CurrentPlayer, _]):-
     display_player(CurrentPlayer).
 
 
-
 % game_loop(+GameState)
 % This is the main game loop
 game_loop([Board, Player, T]):- % If the game is over
     game_over([Board, Player, T], Winner),
     Winner \= none,
     display_board(Board),
-    format('Game over! Winner: ~d', [Winner]).
+    format('Game over! Winner: ~d', [Winner]). % AQUI TINHA DE MORRER, AINDA N MORRE
 game_loop([Board, CurrentPlayer, T]):- % New turn
 
     display_game([Board, CurrentPlayer, T]), nl,
+
+    /*valid_moves_final([Board, CurrentPlayer, T], List),
+    write('Moves: '), write(List), nl,*/
 
     choose_move([Board, CurrentPlayer, T], 0, Move),
 
     move([Board, CurrentPlayer, T], Move, NewGameState),
 
     change_player(NewGameState, NextGameState),
-    
+
     game_loop(NextGameState). % Recursive
 
 
