@@ -48,6 +48,7 @@ get_type_game(T):-
     write('3 - Computer vs Computer'), nl,
     get_number(1, 3, 'Type of game', T),
     (T = 2 -> get_bot_difficulty(T); true),
+    (T = 3 -> get_bot_difficulty(T); true),
     type_game(T).
 
 % Get bot difficulty
