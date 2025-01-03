@@ -22,5 +22,7 @@ change_player([B, CurrentPlayer, T], [B, NewPlayer, T]):-
 
 % display_player(+Player)
 % Displays the current player
-display_player(Player):-
-    format('Player ~d turn: ', [Player]), nl.
+display_player(Type, Player):-
+    (Type = 1 -> format('Player ~d turn: ', [Player]), nl;
+    Type = 2 -> (Player = 1 -> write('Player turn'), nl; write('Computer turn'), nl);
+    Type = 3 -> format('Computer ~d turn: ', [Player]), nl).

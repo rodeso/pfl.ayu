@@ -23,8 +23,15 @@ choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
 
     valid_move_final([Board, CurrentPlayer, _], move(FromX, FromY, ToX, ToY)), 
     !.
+% Easy Computer
+choose_move([Board, CurrentPlayer, T], 1, Move):- 
+    length(Board, S),
+    repeat,
+    nl, write('The Computer is Thinking...'), nl,
+    valid_moves_final([Board, CurrentPlayer, T], ListOfMoves),
+    random_member(Move, ListOfMoves),
 
-% choose_move([Board, CurrentPlayer, T], 1, Move):- 
-    % TODO
+    !.
+% Hard Computer
 % choose_move([Board, CurrentPlayer, T], 2, Move):- 
     % TODO

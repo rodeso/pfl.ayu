@@ -47,17 +47,30 @@ get_type_game(T):-
     write('2 - Human vs Computer'), nl,
     write('3 - Computer vs Computer'), nl,
     get_number(1, 3, 'Type of game', T),
+    (T = 2 -> get_bot_difficulty(T); true),
     type_game(T).
 
+% Get bot difficulty
+get_bot_difficulty(T):-
+    write('Bot difficulty: '), nl,
+    write('1 - Easy'), nl,
+    write('2 - Hard'), nl,
+    get_number(1, 2, 'Bot difficulty', Difficulty),
+    T is T * Difficulty.
 % Get size of the board
 get_size_game(S):-
     write('Size of board: 5, 11, 13, 15'), nl,
     get_size([5, 11, 13, 15], 'Input', S).
 
 % Get the player that will start
-get_player_starts(P):-
-    write('Which Player starts the game? (1 or 2)'), nl,
-    get_size([1, 2], 'Player', P).
+get_player_starts(T, P):-
+    (T = 1 ->
+        write('Which Player starts the game? (1 or 2)'), nl,
+        get_size([1, 2], 'Player', P)
+    ; T = 2 ->
+        write('Who starts first? (1 - Human, 2 - Computer)'), nl,
+        get_size([1, 2], 'Starter', P)
+    ; P = 1).
 
 % Get place to add or remove piece
 get_take_piece(S, X, Y):-
