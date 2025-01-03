@@ -1,4 +1,5 @@
 :- use_module(library(lists)).
+:- use_module(library(random)).
 :- consult(board).    % Functions to create and display the board
 :- consult(input).    % Functions to receive all the inputs
 :- consult(player).   % Functions of all player related
@@ -15,9 +16,9 @@
 % OBRIGATORIO
 % display_game(+GameState)
 % Displays the current board and the current player
-display_game([Board, CurrentPlayer, _]):-
+display_game([Board, CurrentPlayer, T]):-
     display_board(Board), nl,
-    display_player(CurrentPlayer).
+    display_player(T, CurrentPlayer).
 
 
 % game_loop(+GameState)
@@ -33,8 +34,16 @@ game_loop([Board, CurrentPlayer, T]):- % New turn
 
     /*valid_moves_final([Board, CurrentPlayer, T], List),
     write('Moves: '), write(List), nl,*/
+    (T = 1 -> Player is 0;
+    T = 2, CurrentPlayer = 1 -> Player is 0;
+    T = 2, CurrentPlayer = 2 -> Player is 1;
+    T = 3 -> Player is 1;
+    T = 4, CurrentPlayer = 1 -> Player is 0;
+    T = 4, CurrentPlayer = 2 -> Player is 2;
+    T = 6 -> Player is 2),
 
-    choose_move([Board, CurrentPlayer, T], 0, Move),
+
+    choose_move([Board, CurrentPlayer, T], Player, Move),
 
     move([Board, CurrentPlayer, T], Move, NewGameState),
 
@@ -48,7 +57,7 @@ game_loop([Board, CurrentPlayer, T]):- % New turn
 set_up(T, S, P):-
     get_type_game(T), nl,      % input.pl
     get_size_game(S), nl,      % input.pl
-    get_player_starts(P), nl.  % input.pl
+    get_player_starts(T, P), nl.  % input.pl
 
 % OBRIGATORIO
 % initial_state(+GameConfig, -GameState).
@@ -64,7 +73,7 @@ initial_state([T, S, P], GameState):-
     [B, P, T] = GameState.
 
 % OBRIGATORIO
-% T -> type of game being played (1-H/H, 2-H/C, 3-C/C)
+% T -> type of game being played (1-H/H, 2-H/C, 3-C/C, 4-H/C Hard Mode 5- Secret Mode and 6-C/C Hard Mode)
 % S -> size of the board (5, 11, 13 or 15)
 % P -> first player (1 or 2)
 % Main function that starts the game
