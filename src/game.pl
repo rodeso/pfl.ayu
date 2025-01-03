@@ -31,7 +31,22 @@ game_loop([Board, Player, T]):- % If the game is over
 game_loop([Board, CurrentPlayer, T]):-
 
     /*valid_moves_final([Board, CurrentPlayer, T], List),
-    write('Moves: '), write(List), nl,*/
+    write('Moves: '), write(List), nl,
+
+    % Example: Test shortest_paths_multi when the player has a piece at (StartRow, StartCol)
+    get_number(1, 11, 'Start row', StartRow),
+    get_number(1, 11, 'Start column', StartCol),
+    get_number(1, 11, 'End row', EndRow),
+    get_number(1, 11, 'End column', EndCol),
+    
+    % Call the shortest_paths_multi function
+    shortest_paths_multi(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths),
+    
+    % Print the result
+    format('Shortest paths distance: ~d\n', [Distance]),
+    format('Paths: ~w\n', [Paths]),
+*/
+
     (T = 1 -> Player is 0;
     T = 2, CurrentPlayer = 1 -> Player is 0;
     T = 2, CurrentPlayer = 2 -> Player is 1;

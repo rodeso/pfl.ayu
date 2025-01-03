@@ -39,7 +39,7 @@ board(5, [[empty, x, empty, x, empty],
 
 
 % 11x11 board
-board(11, [[empty, x, empty, x, empty, empty, empty, x, empty, x, empty], 
+board(11, [[empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o], 
           [empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],

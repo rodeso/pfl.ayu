@@ -218,7 +218,6 @@ find_neighbors_path(Board, Row, Col, Dist, VisitedPieces, Neighbors) :-
 
 % ------------------------------------------------------------------------------------------------
 
-% WORKS FOR ONLY 1 PATH - TODO: MAKE IT WORK FOR MULTIPLE PATHS 
 % Function to find the shortest path between two pieces - Distance and path
 shortest_paths(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
     bfs_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, Distance, Paths).
@@ -257,6 +256,35 @@ reverse_all([], []).
 reverse_all([H|T], [ReversedH|ReversedT]) :-
     reverse(H, ReversedH),
     reverse_all(T, ReversedT).
+
+% ------------------------------------------------------------------------------------------------
+
+% Finds all shortest paths between two points - Distance and all paths
+shortest_paths_multi(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
+    bfs_all_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, AllPaths),
+    include(path_at_min_distance(AllPaths, Distance), AllPaths, MinDistancePaths),
+    Distance >= 0, % Ensure a valid distance was found
+    findall(Path, member(Distance-Path, MinDistancePaths), ReversedPaths),
+    reverse_all(ReversedPaths, Paths).
+
+% BFS to find all paths
+bfs_all_shortest_paths(_, [], _, _, []). % No path found
+bfs_all_shortest_paths(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, EndRow-EndCol, AllPaths) :-
+    ( neighbor(Row, Col, EndRow, EndCol) ->
+        NewDist is Dist + 1,
+        AllPaths = [NewDist-[EndRow-EndCol|Path]|RestPaths],
+        bfs_all_shortest_paths(Board, Queue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, RestPaths)
+    ;
+        find_neighbors_paths(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
+        append(Queue, Neighbors, NewQueue),
+        bfs_all_shortest_paths(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, RestPaths),
+        AllPaths = RestPaths
+    ).
+
+% Helper to check if a path is at the minimum distance
+path_at_min_distance(AllPaths, MinDistance, Distance-_) :-
+    member(MinDistance-_, AllPaths),
+    Distance =:= MinDistance.
 
 % ------------------------------------------------------------------------------------------------
 

@@ -97,6 +97,9 @@ get_player_starts(T, P):-
     ; T = 2 ->
         write('Who starts first? (1 - Human, 2 - Computer)'), nl,
         get_size([1, 2], 'Starter', P)
+    ; T = 4 -> 
+        write('Who starts first? (1 - Human, 2 - Computer)'), nl,
+        get_size([1, 2], 'Starter', P)
     ; T = 5 ->
         write('Who starts first? (1 - Easy Computer, 2 - Hard Computer)'), nl,
         get_size([1, 2], 'Starter', P)
