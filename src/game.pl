@@ -30,8 +30,6 @@ game_loop([Board, Player, T]):- % If the game is over
 
 game_loop([Board, CurrentPlayer, T]):-
 
-    display_game([Board, CurrentPlayer, T]), nl,
-
     /*valid_moves_final([Board, CurrentPlayer, T], List),
     write('Moves: '), write(List), nl,*/
     (T = 1 -> Player is 0;

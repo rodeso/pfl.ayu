@@ -11,8 +11,12 @@
 % Predicate to choose a move for a human player
 choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
     length(Board, S),
+
     repeat,
-    nl, write('Enter the coordinates of the piece you want to move (X Y):'), nl, nl,
+
+    display_game([Board, CurrentPlayer, _]), nl, nl,
+
+    write('Enter the coordinates of the piece you want to move (X Y):'), nl, nl,
     get_take_piece(S, FromX, FromYProv),
 
     write('Enter the coordinates of the destination (X Y):'), nl, nl,

@@ -171,10 +171,23 @@ valid_moves_final([Board, CurrentPlayer, T], UniqueListOfMoves) :-
         ListOfMoves),
     sort(ListOfMoves, UniqueListOfMoves).
 
+% ------------------------------------------------------------------------------------------------
+
+% valid_moves_bool([Board, CurrentPlayer, _], ListOfMoves)
+% Returns true if there is at least one valid move for the CurrentPlayer on the Board
+% Used to check if the game is over
+valid_moves_bool([Board, CurrentPlayer, T]) :-
+    length(Board, Size),
+    between(1, Size, FromX),
+    between(1, Size, FromY),
+    piece_at(Board, FromX, FromY, CurrentPlayer),
+    between(1, Size, ToX),
+    between(1, Size, ToY),
+    (FromX \= ToX; FromY \= ToY),
+    empty_at(Board, ToX, ToY),
+    valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)),
+    !.
 
 
-
-
-    
 
     
