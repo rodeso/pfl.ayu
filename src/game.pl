@@ -38,6 +38,8 @@ game_loop([Board, CurrentPlayer, T]):-
     T = 3 -> Player is 1;
     T = 4, CurrentPlayer = 1 -> Player is 0;
     T = 4, CurrentPlayer = 2 -> Player is 2;
+    T = 5, CurrentPlayer = 1 -> Player is 1;
+    T = 5, CurrentPlayer = 2 -> Player is 2;
     T = 6 -> Player is 2),
 
 
@@ -71,7 +73,7 @@ initial_state([T, S, P], GameState):-
     [B, P, T] = GameState.
 
 % OBRIGATORIO
-% T -> type of game being played (1-H/H, 2-H/C, 3-C/C, 4-H/C Hard Mode 5- Secret Mode and 6-C/C Hard Mode)
+% T -> type of game being played (1-H/H, 2-H/C Easy, 3-C/C Easy/Easy, 4-H/C Hard, 5-C/C Easy/Hard and 6-C/C Hard/Hard)
 % S -> size of the board (5, 11, 13 or 15)
 % P -> first player (1 or 2)
 % Main function that starts the game
