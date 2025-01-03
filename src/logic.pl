@@ -31,7 +31,8 @@ choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
 choose_move([Board, CurrentPlayer, T], 1, Move):- 
     length(Board, S),
     repeat,
-    nl, write('The Computer is Thinking...'), nl,
+    display_game([Board, CurrentPlayer, _]), nl, nl,
+    nl, write('The Computer is Thinking...'), nl, nl,
     valid_moves_final([Board, CurrentPlayer, T], ListOfMoves),
     random_member(Move, ListOfMoves),
 
