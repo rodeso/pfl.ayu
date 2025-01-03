@@ -28,15 +28,56 @@ choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
     valid_move_final([Board, CurrentPlayer, _], move(FromX, FromY, ToX, ToY)), 
     !.
 % Easy Computer
-choose_move([Board, CurrentPlayer, T], 1, Move):- 
+choose_move([Board, CurrentPlayer, _], 1, Move):- 
     length(Board, S),
     repeat,
     display_game([Board, CurrentPlayer, _]), nl, nl,
     nl, write('The Computer is Thinking...'), nl, nl,
-    valid_moves_final([Board, CurrentPlayer, T], ListOfMoves),
+    valid_moves_final([Board, CurrentPlayer, _], ListOfMoves),
     random_member(Move, ListOfMoves),
-
     !.
+
 % Hard Computer
-% choose_move([Board, CurrentPlayer, T], 2, Move):- 
-    % TODO
+choose_move([Board, CurrentPlayer, _], 2, Move):-
+    length(Board, S),
+    repeat,
+    display_game([Board, CurrentPlayer, _]), nl, nl,
+    nl, write('The Computer is Thinking...'), nl, nl,
+    valid_moves_final([Board, CurrentPlayer, _], ListOfMoves), % Get the list of moves
+    hard_bot([Board, CurrentPlayer, _], ListOfMoves, ListOfBestMoves),
+    random_member(Move, ListOfBestMoves),
+    !.
+
+% Go through all the moves (ListOfMoves) possible boards
+    % see valid_moves para o oponente
+    % selecionar apenas os que tem o maior numero de moves para o oponente
+% hard_bot(GameState, ListOfMoves, ListOfBestMoves)
+% This function evaluates all possible moves for the current player and chooses the ones that minimize the opponent's valid moves.
+hard_bot([Board, CurrentPlayer, _], ListOfMoves, ListOfBestMoves) :-
+    % Get the opponent player
+    switch_player(CurrentPlayer, Opponent),
+    
+    % Evaluate each move in ListOfMoves, generating a score based on the number of valid moves the opponent has
+    findall(Score-Move, (
+        member(Move, ListOfMoves),                                 % For each move
+        move([Board, CurrentPlayer, _], Move, TempGameState),      % Simulate the move
+        change_player(TempGameState, OpponentGameState),
+        valid_moves_final(OpponentGameState, OpponentMoves),           % Find valid moves for the opponent on the new board
+        length(OpponentMoves, Score)                               % The score is the number of opponent moves (fewer is better)
+    ), ScoredMoves),
+
+    % Find the minimum score
+    min_score_moves(ScoredMoves, MinScore, ListOfBestMoves),
+    !.
+
+% min_score_moves(ScoredMoves, MinScore, BestMoves)
+% This helper function finds the moves with the minimum score from the list of scored moves.
+min_score_moves(ScoredMoves, MinScore, BestMoves) :-
+    % Find the minimum score
+    min_member(MinScore-_, ScoredMoves),
+
+    % Collect all moves with this minimum score
+    findall(Move, member(MinScore-Move, ScoredMoves), BestMoves).
+
+
+
