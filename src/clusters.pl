@@ -185,3 +185,141 @@ find_neighbors_space(Board, Piece, Row, Col, Neighbors) :-
         ),
         Neighbors
     ).
+
+
+% ------------------------------------------------------------------------------------------------
+
+% Function to find the shortest path between two pieces - Just distance
+shortest_path(Board, StartRow-StartCol, EndRow-EndCol, Distance) :-
+    bfs_shortest_path(Board, [(StartRow-StartCol,0)], [], EndRow-EndCol, Distance).
+
+bfs_shortest_path(_, [], _, _, -1). % No path found
+bfs_shortest_path(Board, [(Row-Col, Dist) | _], _, EndRow-EndCol, Distance):- % Found the end
+    neighbor(Row, Col, EndRow, EndCol),
+    Distance is Dist + 1, !.
+
+bfs_shortest_path(Board, [(Row-Col, Dist) | Queue], VisitedPieces, EndRow-EndCol, Distance):- % Continue search
+    find_neighbors_path(Board, Row, Col, Dist, VisitedPieces, Neighbors),
+    append(Queue, Neighbors, NewQueue),
+    bfs_shortest_path(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, Distance).
+
+find_neighbors_path(Board, Row, Col, Dist, VisitedPieces, Neighbors) :-
+    findall(
+        (R-C, D),
+        ( % Confirm its a neighbor, within bounds, not visited and not ocupied
+            neighbor(Row, Col, R, C), 
+            within_bounds(Board, R, C), 
+            \+ member((R-C, _), VisitedPieces),
+            get_piece(Board, R, C, empty),
+            D is Dist + 1
+        ), 
+        Neighbors
+    ).
+
+% ------------------------------------------------------------------------------------------------
+
+% WORKS FOR ONLY 1 PATH - TODO: MAKE IT WORK FOR MULTIPLE PATHS 
+% Function to find the shortest path between two pieces - Distance and path
+shortest_paths(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
+    bfs_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, Distance, Paths).
+
+bfs_shortest_paths(_, [], _, _, -1, []):- !. % No path found
+bfs_shortest_paths(Board, [(Row-Col, Dist, Path) | _], _, EndRow-EndCol, Distance, [FullPath]) :- % Found the end
+    neighbor(Row, Col, EndRow, EndCol),
+    Distance is Dist + 1,
+    reverse([EndRow-EndCol | Path], FullPath), !.
+
+bfs_shortest_paths(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, EndRow-EndCol, Distance, Paths) :- % Continue search
+    find_neighbors_paths(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
+    append(Queue, Neighbors, NewQueue),
+    bfs_shortest_paths(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, Distance, Paths).
+
+find_neighbors_paths(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors) :-
+    findall(
+        (R-C, D, [R-C | Path]),
+        ( % Confirm it's a neighbor, within bounds, and not visited
+            neighbor(Row, Col, R, C), 
+            within_bounds(Board, R, C), 
+            \+ member((R-C, _), VisitedPieces),
+            get_piece(Board, R, C, empty),
+            D is Dist + 1
+        ), 
+        Neighbors
+    ).
+
+% Helper to collect all paths at the minimum distance
+bfs_shortest_paths(_, [], _, _, Distance, Paths) :-
+    Distance > 0, % Distance exists, ensure paths are finalized
+    aggregate_all(set(Path), member(Path, Paths), UniquePaths),
+    reverse_all(UniquePaths, Paths).
+
+reverse_all([], []).
+reverse_all([H|T], [ReversedH|ReversedT]) :-
+    reverse(H, ReversedH),
+    reverse_all(T, ReversedT).
+
+% ------------------------------------------------------------------------------------------------
+
+% Main function to find shortest paths between a specific cluster and all other clusters
+shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths):-
+
+    find_cluster_with_element(Elements, FromX, FromY, Cluster),           % Get the starting cluster
+
+    exclude(==(Cluster), Elements, OtherClusters),                        % Take out the starting cluster
+
+    find_shortest_paths_for_all_clusters(Board, Cluster, OtherClusters, [], AllShortestPaths).
+
+% Helper function to find the shortest paths between Cluster and all other clusters
+find_shortest_paths_for_all_clusters(_, _, [], ShortestPaths, ShortestPaths).  % Base case: no more clusters
+find_shortest_paths_for_all_clusters(Board, Cluster, [OtherCluster | Rest], Acc, AllShortestPaths):-
+    all_shortest_paths_between_two_clusters(Board, Cluster, OtherCluster, ShortestPaths),
+
+    find_shortest_paths_for_all_clusters(Board, Cluster, Rest, [ShortestPaths | Acc], AllShortestPaths).
+
+% Function to find all shortest paths between two clusters
+all_shortest_paths_between_two_clusters(Board, Cluster1, Cluster2, ShortestPaths) :-
+    findall(
+        Distance-Path,
+        (
+            member(E1, Cluster1),
+            member(E2, Cluster2),
+            E1 = Row1-Col1,
+            E2 = Row2-Col2,
+            shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),
+            Distance > 0
+        ),
+        AllPaths
+    ),
+
+    sort(AllPaths, SortedPaths),
+    SortedPaths = [MinDistance-_|_],
+    include(same_min_distance(MinDistance), SortedPaths, ShortestPaths).
+
+% Helper to check if a path has the minimum distance
+same_min_distance(MinDistance, Distance-_) :- Distance =:= MinDistance.
+
+% ------------------------------------------------------------------------------------------------
+
+% Main function to check if any path in AllShortestPaths includes the point (ToX, ToY)
+path_includes_point(AllShortestPaths, ToX, ToY):-
+    % Iterate through all shortest paths and check if any path includes the point (ToX, ToY)
+    member(ShortestPaths, AllShortestPaths),
+    member(_-PathList, ShortestPaths),  % PathList is the list of paths with associated Distance (ignore Distance)
+    flat_list(PathList, Path),  % Flatten any nested list structure in PathList
+    path_contains_point(Path, ToX, ToY),
+    !.
+
+% Helper function to check if a specific path contains the point (ToX, ToY)
+path_contains_point([ToX-ToY | _], ToX, ToY).
+path_contains_point([X-Y | Rest], ToX, ToY):-
+    path_contains_point(Rest, ToX, ToY).
+
+
+% Custom flatten predicate to handle nested lists
+flat_list([], []).  % Base case: empty list is already flattened
+flat_list([Head|Tail], FlatList):-
+    !,
+    flat_list(Head, FlatHead),
+    flat_list(Tail, FlatTail),
+    append(FlatHead, FlatTail, FlatList).
+flat_list(NonList, [NonList]).

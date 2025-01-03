@@ -24,15 +24,15 @@ display_game([Board, CurrentPlayer, _]):-
 % This is the main game loop
 game_loop([Board, Player, T]):- % If the game is over
     game_over([Board, Player, T], Winner),
-    Winner \= none,
     display_board(Board),
-    format('Game over! Winner: ~d', [Winner]). % AQUI TINHA DE MORRER, AINDA N MORRE
-game_loop([Board, CurrentPlayer, T]):- % New turn
+    format('Game over! Winner: ~d', [Winner]), !.
+
+game_loop([Board, CurrentPlayer, T]):-
 
     display_game([Board, CurrentPlayer, T]), nl,
 
-    /*valid_moves_final([Board, CurrentPlayer, T], List),
-    write('Moves: '), write(List), nl,*/
+    valid_moves_final([Board, CurrentPlayer, T], List),
+    write('Moves: '), write(List), nl, nl,
 
     choose_move([Board, CurrentPlayer, T], 0, Move),
 

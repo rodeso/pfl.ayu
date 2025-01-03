@@ -1,18 +1,33 @@
 :- use_module(library(lists)).
-% 5x5 board (for testing)
-/*board(5, [[empty, x, empty, x, empty], 
+% 5x5 board
+board(5, [[empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
           [empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
-          [empty, x, empty, x, empty]]).*/
-board(5, [[empty, empty, x, x, empty], 
-          [o, o, o, empty, o], 
+          [empty, x, empty, x, empty]]).
+
+/*board(5, [[empty, empty, o, empty, empty],  % exemplo 1 - X automatic winner, O perfect to test connections between a big cluster and a isolated piece
+          [o, o, o, x, o], 
           [empty, empty, o, x, empty], 
           [o, o, o, o, empty], 
-          [o, x, empty, o, empty]]).
+          [o, x, empty, o, empty]]).*/
+
+/*board(5, [[x, empty, empty, empty, x],  % exemplo 2 - X in a line, O in a square (Problem 1)
+          [empty, empty, empty, o, empty], 
+          [empty, empty, o, empty, empty], 
+          [empty, empty, empty, empty, empty], 
+          [empty, empty, empty, empty, empty]]).*/
+          
+/*board(5, [[x, empty, empty, empty, x],  % exemplo 3 - X in a line, O 2 + clusters diagonally (Problem 2)
+          [empty, empty, empty, o, o], 
+          [empty, o, o, empty, empty], 
+          [empty, empty, empty, empty, empty], 
+          [empty, empty, empty, empty, empty]]).*/
+
+
 
 % 11x11 board
-board(11, [[empty, x, x, x, empty, empty, empty, x, empty, x, empty], 
+board(11, [[empty, x, empty, x, empty, empty, empty, x, empty, x, empty], 
           [x, empty, o, empty, o, empty, o, empty, o, empty, o], 
           [o, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],
