@@ -48,7 +48,17 @@ all_elements([Pair|Rest], List2) :-
     member(Pair, List2),
     all_elements(Rest, List2).
 
+% Removes ONLY the first occurrence of the element
 remove_element(_, [], []).
-remove_element(Element, [Element|Rest], Rest).
+remove_element(Element, [Element|Rest], Rest) :- !. 
 remove_element(Element, [Head|Rest], [Head|NewRest]) :-
     remove_element(Element, Rest, NewRest).
+
+% Custom flatten predicate to handle nested lists
+flat_list([], []).  % Base case: empty list is already flattened
+flat_list([Head|Tail], FlatList):-
+    !,
+    flat_list(Head, FlatHead),
+    flat_list(Tail, FlatTail),
+    append(FlatHead, FlatTail, FlatList).
+flat_list(NonList, [NonList]).

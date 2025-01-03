@@ -270,11 +270,19 @@ shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths)
     find_shortest_paths_for_all_clusters(Board, Cluster, OtherClusters, [], AllShortestPaths).
 
 % Helper function to find the shortest paths between Cluster and all other clusters
-find_shortest_paths_for_all_clusters(_, _, [], ShortestPaths, ShortestPaths).  % Base case: no more clusters
-find_shortest_paths_for_all_clusters(Board, Cluster, [OtherCluster | Rest], Acc, AllShortestPaths):-
-    all_shortest_paths_between_two_clusters(Board, Cluster, OtherCluster, ShortestPaths),
+    % Base case: no more clusters to process
+find_shortest_paths_for_all_clusters(_, _, [], ShortestPaths, ShortestPaths).
 
-    find_shortest_paths_for_all_clusters(Board, Cluster, Rest, [ShortestPaths | Acc], AllShortestPaths).
+    % Recursive case: process each cluster and accumulate results
+find_shortest_paths_for_all_clusters(Board, Cluster, [OtherCluster | Rest], Acc, AllShortestPaths) :-
+    (
+        all_shortest_paths_between_two_clusters(Board, Cluster, OtherCluster, ShortestPathsForCluster) ->
+        NewAcc = [ShortestPathsForCluster | Acc]
+    ;
+        NewAcc = Acc
+    ),
+    find_shortest_paths_for_all_clusters(Board, Cluster, Rest, NewAcc, AllShortestPaths).
+
 
 % Function to find all shortest paths between two clusters
 all_shortest_paths_between_two_clusters(Board, Cluster1, Cluster2, ShortestPaths) :-
@@ -300,6 +308,20 @@ same_min_distance(MinDistance, Distance-_) :- Distance =:= MinDistance.
 
 % ------------------------------------------------------------------------------------------------
 
+% Function to filter paths with the minimum distance
+filter_minimum_distance_paths(AllShortestPaths, FilteredPaths) :-
+
+    flat_list(AllShortestPaths, FlattenedPaths),
+
+    findall(Distance, member(Distance-_, FlattenedPaths), Distances),
+
+    my_min_list(Distances, MinDistance),
+
+    include(same_min_distance(MinDistance), FlattenedPaths, FilteredPaths).
+
+
+% ------------------------------------------------------------------------------------------------
+
 % Main function to check if any path in AllShortestPaths includes the point (ToX, ToY)
 path_includes_point(AllShortestPaths, ToX, ToY):-
     % Iterate through all shortest paths and check if any path includes the point (ToX, ToY)
@@ -314,12 +336,3 @@ path_contains_point([ToX-ToY | _], ToX, ToY).
 path_contains_point([X-Y | Rest], ToX, ToY):-
     path_contains_point(Rest, ToX, ToY).
 
-
-% Custom flatten predicate to handle nested lists
-flat_list([], []).  % Base case: empty list is already flattened
-flat_list([Head|Tail], FlatList):-
-    !,
-    flat_list(Head, FlatHead),
-    flat_list(Tail, FlatTail),
-    append(FlatHead, FlatTail, FlatList).
-flat_list(NonList, [NonList]).

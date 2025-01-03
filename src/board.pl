@@ -24,12 +24,24 @@ board(5, [[empty, x, empty, x, empty],
           [empty, empty, empty, empty, empty], 
           [empty, empty, empty, empty, empty]]).*/
 
+/*board(5, [[x, x, x, empty, empty], % exemplo 4
+          [x, o, empty, o, x], 
+          [x, empty, x, empty, empty], 
+          [empty, o, empty, o, empty], 
+          [x, empty, x, empty, empty]]).*/
+
+/*board(5, [[x, empty, empty, empty, empty],  % exemplo 5 - versão basica do exemplo 4
+          [x, empty, x, empty, empty], 
+          [empty, empty, empty, empty, empty], 
+          [empty, x, x, empty, empty], 
+          [empty, empty, empty, empty, empty]]).*/
+
 
 
 % 11x11 board
 board(11, [[empty, x, empty, x, empty, empty, empty, x, empty, x, empty], 
-          [x, empty, o, empty, o, empty, o, empty, o, empty, o], 
-          [o, x, empty, x, empty, x, empty, x, empty, x, empty], 
+          [o, empty, o, empty, o, empty, o, empty, o, empty, o], 
+          [empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],
           [empty, x, empty, x, empty, x, empty, x, empty, x, empty], 
           [o, empty, o, empty, o, empty, o, empty, o, empty, o],
