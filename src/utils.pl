@@ -75,3 +75,7 @@ flat_list([Head|Tail], FlatList):-
     flat_list(Tail, FlatTail),
     append(FlatHead, FlatTail, FlatList).
 flat_list(NonList, [NonList]).
+
+% Helper predicate to check if a cluster contains a specific element
+has_element(Element, Cluster):-
+    member(Element, Cluster).

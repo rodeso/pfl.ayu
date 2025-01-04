@@ -273,8 +273,9 @@ shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths)
 
     find_cluster_with_element(Elements, FromX, FromY, Cluster),           % Get the starting cluster
 
-    exclude(==(Cluster), Elements, OtherClusters),                        % Take out the starting cluster
-
+    Cluster = [FirstElement|_],
+    exclude(has_element(FirstElement), Elements, OtherClusters),          % Take out the cluster
+    
     find_shortest_paths_for_all_clusters(Board, Cluster, OtherClusters, [], AllShortestPaths).
 
 % Helper function to find the shortest paths between Cluster and all other clusters
@@ -301,8 +302,8 @@ all_shortest_paths_between_two_clusters(Board, Cluster1, Cluster2, ShortestPaths
             member(E2, Cluster2),
             E1 = Row1-Col1,
             E2 = Row2-Col2,
-            shortest_paths_multi(Board, Col1-Row1, Col2-Row2, Distance, Path),
-            /*shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),*/
+            /*shortest_paths_multi(Board, Col1-Row1, Col2-Row2, Distance, Path),*/
+            shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),
             Distance > 0
         ),
         AllPaths
