@@ -68,15 +68,11 @@ valid_move_final([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)):-
     length(ClusterWithSpaces, EspaceTotalCount),
     Dif is EspaceTotalCount - EspaceCount,
 
-    % Se o cluster for sozinho perceber se está numa zona só com espaço vazio
-    (ClusterSize == 1 ->
-        ( Dif == 1 ->   % If the cluster size is not 1, it's an error
-            write('Error: This piece is isolated so it can not move.'), nl, nl, fail
-        ;
-            true 
-        );
-        true
-    ).
+    % If  dif is the same as the cluster size, it means that the cluster is isolated
+    ( Dif == ClusterSize -> 
+        write('Error: This piece is isolated so it can not move.'), nl, nl, fail;
+        true ).
+
 
 % ------------------------------------------------------------------------------------------------
 

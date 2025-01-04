@@ -34,6 +34,19 @@ same_type(Piece1, Piece2):- Piece1 == Piece2.
 get_board([Board, _, _], RetBoard):-
     Board = RetBoard.
 
+% Get the piece at a specific cell
+get_piece(Board, Row, Col, Piece) :-
+    nth1(Row, Board, RowList),
+    nth1(Col, RowList, Piece).
+
+% Check if a cell is within bounds
+within_bounds(Board, Row, Col) :-
+    length(Board, N),
+    Row > 0, Row =< N,
+    nth1(Row, Board, RowList),
+    length(RowList, M),
+    Col > 0, Col =< M.
+
 % valid_one_move(+FromX, +FromY, +ToX, +ToY)
 % Ensure that the move for an isolated piece is exactly 1 square away
 valid_one_move(FromX, FromY, ToX, ToY) :-

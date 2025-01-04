@@ -7,44 +7,42 @@
 % Entry point to count clusters for a player
 count_clusters(Board, Player, Count) :-
     piece_player(Player, Piece),
-    retractall(visited(_, _)), % Clear visited cells
     findall(Row-Col, (nth1(Row, Board, RowList), nth1(Col, RowList, Piece)), AllPieces),
-    count_clusters_aux(Board, Piece, AllPieces, 0, Count).
+    count_clusters_aux(Board, Piece, AllPieces, [], 0, Count).
 
 % Helper to traverse all pieces
-count_clusters_aux(_, _, [], Count, Count).
-count_clusters_aux(Board, Piece, [Row-Col | Rest], Acc, Count) :-
-    (visited(Row, Col) ->
+count_clusters_aux(_, _, [], _, Count, Count).
+count_clusters_aux(Board, Piece, [Row-Col | Rest], Visited, Acc, Count) :-
+    (member(Row-Col, Visited) ->
         % If already visited, skip
-        count_clusters_aux(Board, Piece, Rest, Acc, Count)
+        count_clusters_aux(Board, Piece, Rest, Visited, Acc, Count)
     ;
         % Start BFS for a new cluster
-        bfs(Board, Piece, [Row-Col], []),
+        bfs(Board, Piece, [Row-Col], [], NewVisited),
         NewAcc is Acc + 1,
-        count_clusters_aux(Board, Piece, Rest, NewAcc, Count)
+        count_clusters_aux(Board, Piece, Rest, NewVisited, NewAcc, Count)
     ).
 
 % BFS implementation
-bfs(_, _, [], _).
-bfs(Board, Piece, [Row-Col | Queue], VisitedNodes) :-
-    (visited(Row, Col) ->
-        bfs(Board, Piece, Queue, VisitedNodes)
+bfs(_, _, [], Visited, Visited).
+bfs(Board, Piece, [Row-Col | Queue], Visited, FinalVisited) :-
+    (member(Row-Col, Visited) ->
+        bfs(Board, Piece, Queue, Visited, FinalVisited)
     ;
-        assert(visited(Row, Col)),
-        find_neighbors(Board, Piece, Row, Col, Neighbors),
+        find_neighbors(Board, Piece, Row, Col, Neighbors, Visited),
         append(Queue, Neighbors, NewQueue),
-        bfs(Board, Piece, NewQueue, [Row-Col | VisitedNodes])
+        bfs(Board, Piece, NewQueue, [Row-Col | Visited], FinalVisited)
     ).
 
 % Find valid neighbors for BFS
-find_neighbors(Board, Piece, Row, Col, Neighbors) :-
+find_neighbors(Board, Piece, Row, Col, Neighbors, Visited) :-
     findall(
         R-C,
         (
             neighbor(Row, Col, R, C),
             within_bounds(Board, R, C),
             get_piece(Board, R, C, Piece),
-            \+ visited(R, C)
+            \+ member(R-C, Visited)
         ),
         Neighbors
     ).
@@ -55,52 +53,38 @@ neighbor(Row, Col, Row1, Col) :- Row1 is Row + 1.
 neighbor(Row, Col, Row, Col1) :- Col1 is Col - 1.
 neighbor(Row, Col, Row, Col1) :- Col1 is Col + 1.
 
-% Check if a cell is within bounds
-within_bounds(Board, Row, Col) :-
-    length(Board, N),
-    Row > 0, Row =< N,
-    nth1(Row, Board, RowList),
-    length(RowList, M),
-    Col > 0, Col =< M.
-
-% Get the piece at a specific cell
-get_piece(Board, Row, Col, Piece) :-
-    nth1(Row, Board, RowList),
-    nth1(Col, RowList, Piece).
 
 % ------------------------------------------------------------------------------------------------
 
 % List cluster sizes and their elements for a player
 list_clusters_with_elements(Board, Player, Sizes, Elements) :-
     piece_player(Player, Piece),
-    retractall(visited(_, _)), % Clear visited cells
     findall(Row-Col, (nth1(Row, Board, RowList), nth1(Col, RowList, Piece)), AllPieces),
-    list_clusters_with_elements_aux(Board, Piece, AllPieces, [], [], Sizes, Elements).
+    list_clusters_with_elements_aux(Board, Piece, AllPieces, [], [], [], Sizes, Elements).
 
 % Helper to traverse all pieces and list sizes and elements
-list_clusters_with_elements_aux(_, _, [], Sizes, Elements, Sizes, Elements).
-list_clusters_with_elements_aux(Board, Piece, [Row-Col | Rest], AccSizes, AccElements, Sizes, Elements) :-
-    (visited(Row, Col) ->
+list_clusters_with_elements_aux(_, _, [], _, AccSizes, AccElements, AccSizes, AccElements).
+list_clusters_with_elements_aux(Board, Piece, [Row-Col | Rest], Visited, AccSizes, AccElements, Sizes, Elements) :-
+    (member(Row-Col, Visited) ->
         % If already visited, skip
-        list_clusters_with_elements_aux(Board, Piece, Rest, AccSizes, AccElements, Sizes, Elements)
+        list_clusters_with_elements_aux(Board, Piece, Rest, Visited, AccSizes, AccElements, Sizes, Elements)
     ;
         % Start BFS for a new cluster, count its size, and collect its elements
-        bfs_size_and_elements(Board, Piece, [Row-Col], [], 0, Size, [], ClusterElements),
-        list_clusters_with_elements_aux(Board, Piece, Rest, [Size|AccSizes], [ClusterElements|AccElements], Sizes, Elements)
+        bfs_size_and_elements(Board, Piece, [Row-Col], [], 0, Size, [], ClusterElements, NewVisited),
+        list_clusters_with_elements_aux(Board, Piece, Rest, NewVisited, [Size|AccSizes], [ClusterElements|AccElements], Sizes, Elements)
     ).
 
 % BFS implementation that calculates cluster size and collects elements
-bfs_size_and_elements(_, _, [], _, Size, Size, Cluster, Cluster).
-bfs_size_and_elements(Board, Piece, [Row-Col | Queue], VisitedNodes, AccSize, Size, AccCluster, Cluster) :-
-    (visited(Row, Col) ->
-        bfs_size_and_elements(Board, Piece, Queue, VisitedNodes, AccSize, Size, AccCluster, Cluster)
+bfs_size_and_elements(_, _, [], Visited, Size, Size, Cluster, Cluster, Visited).
+bfs_size_and_elements(Board, Piece, [Row-Col | Queue], Visited, AccSize, Size, AccCluster, Cluster, FinalVisited) :-
+    (member(Row-Col, Visited) ->
+        bfs_size_and_elements(Board, Piece, Queue, Visited, AccSize, Size, AccCluster, Cluster, FinalVisited)
     ;
-        assert(visited(Row, Col)),
-        find_neighbors(Board, Piece, Row, Col, Neighbors),
+        find_neighbors(Board, Piece, Row, Col, Neighbors, Visited),
         append(Queue, Neighbors, NewQueue),
         NewAccSize is AccSize + 1,
         NewAccCluster = [Row-Col|AccCluster],
-        bfs_size_and_elements(Board, Piece, NewQueue, [Row-Col | VisitedNodes], NewAccSize, Size, NewAccCluster, Cluster)
+        bfs_size_and_elements(Board, Piece, NewQueue, [Row-Col|Visited], NewAccSize, Size, NewAccCluster, Cluster, FinalVisited)
     ).
 
 
@@ -131,9 +115,7 @@ find_cluster_with_element(Elements, X, Y, Cluster) :-
 
 % Finds the cluster of a specified piece and counts adjacent empty spaces row Y and col X
 find_piece_cluster_with_spaces(Board, StartRow-StartCol, Cluster, EspaceCount) :-
-    retractall(visited(_, _)), % Clear visited nodes
     get_piece(Board, StartRow, StartCol, Piece),
-    % write('Starting piece: '), write(Piece), nl,
     bfs_piece_cluster(Board, Piece, [StartRow-StartCol], [], [], 0, PieceCluster, EspaceCount, SpaceCluster),
     append(PieceCluster, SpaceCluster, Cluster).
 
@@ -142,22 +124,22 @@ bfs_piece_cluster(_, _, [], ClusterAcc, EmptyAcc, _, Cluster, EspaceCount, Space
     reverse(ClusterAcc, Cluster), % Finalize cluster list
     reverse(EmptyAcc, SpaceCluster),
     length(EmptyAcc, EspaceCount). % Count unique empty spaces
-bfs_piece_cluster(Board, Piece, [Row-Col | Queue], ClusterAcc, EmptyAcc, AccEspaceCount, Cluster, EspaceCount, SpaceCluster) :-
-    (visited(Row, Col) ->
+bfs_piece_cluster(Board, Piece, [Row-Col | Queue], ClusterAcc, EmptyAcc, AccVisited, Cluster, EspaceCount, SpaceCluster) :-
+    (member(Row-Col, AccVisited) ->
         % Skip already visited cells
-        bfs_piece_cluster(Board, Piece, Queue, ClusterAcc, EmptyAcc, AccEspaceCount, Cluster, EspaceCount, SpaceCluster)
+        bfs_piece_cluster(Board, Piece, Queue, ClusterAcc, EmptyAcc, AccVisited, Cluster, EspaceCount, SpaceCluster)
     ;
-        assert(visited(Row, Col)), % Mark current cell as visited
+        % Mark current cell as visited
+        NewVisited = [Row-Col | AccVisited],
         get_piece(Board, Row, Col, CellPiece),
-        % write('Visiting Y: '), write(Row), write(' X: '), write(Col), nl,
         (CellPiece = Piece ->
             % Add to cluster if it matches the target piece
-            find_neighbors_space(Board, Piece, Row, Col, Neighbors),
+            find_neighbors_space(Board, Piece, Row, Col, Neighbors, NewVisited),
             append(Queue, Neighbors, NewQueue),
-            bfs_piece_cluster(Board, Piece, NewQueue, [Row-Col | ClusterAcc], EmptyAcc, AccEspaceCount, Cluster, EspaceCount, SpaceCluster)
+            bfs_piece_cluster(Board, Piece, NewQueue, [Row-Col | ClusterAcc], EmptyAcc, NewVisited, Cluster, EspaceCount, SpaceCluster)
         ; CellPiece = empty ->
             % Count empty spaces
-            find_neighbors_space(Board, Piece, Row, Col, Neighbors),
+            find_neighbors_space(Board, Piece, Row, Col, Neighbors, NewVisited),
             append(Queue, Neighbors, NewQueue),
             (member(Row-Col, EmptyAcc) ->
                 % Avoid duplicate empty spaces
@@ -165,15 +147,15 @@ bfs_piece_cluster(Board, Piece, [Row-Col | Queue], ClusterAcc, EmptyAcc, AccEspa
             ;
                 NewEmptyAcc = [Row-Col | EmptyAcc]
             ),
-            bfs_piece_cluster(Board, Piece, NewQueue, ClusterAcc, NewEmptyAcc, AccEspaceCount, Cluster, EspaceCount, SpaceCluster)
+            bfs_piece_cluster(Board, Piece, NewQueue, ClusterAcc, NewEmptyAcc, NewVisited, Cluster, EspaceCount, SpaceCluster)
         ;
             % Skip other cells
-            bfs_piece_cluster(Board, Piece, Queue, ClusterAcc, EmptyAcc, AccEspaceCount, Cluster, EspaceCount, SpaceCluster)
+            bfs_piece_cluster(Board, Piece, Queue, ClusterAcc, EmptyAcc, NewVisited, Cluster, EspaceCount, SpaceCluster)
         )
     ).
 
 % Define neighbors (horizontal and vertical only)
-find_neighbors_space(Board, Piece, Row, Col, Neighbors) :-
+find_neighbors_space(Board, Piece, Row, Col, Neighbors, Visited) :-
     findall(
         R-C,
         (
@@ -181,7 +163,7 @@ find_neighbors_space(Board, Piece, Row, Col, Neighbors) :-
             within_bounds(Board, R, C),
             get_piece(Board, R, C, NeighborPiece),
             (NeighborPiece = Piece ; NeighborPiece = empty), % Include target piece and empty spaces
-            \+ visited(R, C)
+            \+ member(R-C, Visited)
         ),
         Neighbors
     ).
