@@ -194,7 +194,7 @@ shortest_path(Board, StartRow-StartCol, EndRow-EndCol, Distance) :-
     bfs_shortest_path(Board, [(StartRow-StartCol,0)], [], EndRow-EndCol, Distance).
 
 bfs_shortest_path(_, [], _, _, -1). % No path found
-bfs_shortest_path(Board, [(Row-Col, Dist) | _], _, EndRow-EndCol, Distance):- % Found the end
+bfs_shortest_path(_, [(Row-Col, Dist) | _], _, EndRow-EndCol, Distance):- % Found the end
     neighbor(Row, Col, EndRow, EndCol),
     Distance is Dist + 1, !.
 
@@ -223,7 +223,7 @@ shortest_paths(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
     bfs_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, Distance, Paths).
 
 bfs_shortest_paths(_, [], _, _, -1, []):- !. % No path found
-bfs_shortest_paths(Board, [(Row-Col, Dist, Path) | _], _, EndRow-EndCol, Distance, [FullPath]) :- % Found the end
+bfs_shortest_paths(_, [(Row-Col, Dist, Path) | _], _, EndRow-EndCol, Distance, [FullPath]) :- % Found the end
     neighbor(Row, Col, EndRow, EndCol),
     Distance is Dist + 1,
     reverse([EndRow-EndCol | Path], FullPath), !.
@@ -262,12 +262,14 @@ reverse_all([H|T], [ReversedH|ReversedT]) :-
 % Finds all shortest paths between two points - Distance and all paths
 shortest_paths_multi(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
     bfs_all_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, AllPaths),
-    include(path_at_min_distance(AllPaths, Distance), AllPaths, MinDistancePaths),
-    Distance >= 0,
+    % Extract the minimum distance paths
+    maplist(arg(1), AllPaths, Distances), 
+    my_min_list(Distances, Distance),
+    include(path_at_min_distance(Distance), AllPaths, MinDistancePaths),
     findall(Path, member(Distance-Path, MinDistancePaths), ReversedPaths),
     reverse_all(ReversedPaths, Paths).
 
-bfs_all_shortest_paths(_, [], _, _, []).
+bfs_all_shortest_paths(_, [], _, _, []):- !.
 bfs_all_shortest_paths(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, EndRow-EndCol, AllPaths) :-
     ( neighbor(Row, Col, EndRow, EndCol) ->
         NewDist is Dist + 1,
@@ -275,13 +277,11 @@ bfs_all_shortest_paths(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, En
         bfs_all_shortest_paths(Board, Queue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, RestPaths)
     ;
         find_neighbors_paths(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
-        append(Queue, Neighbors, NewQueue),
-        bfs_all_shortest_paths(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, RestPaths),
-        AllPaths = RestPaths
+        append(Neighbors, Queue, NewQueue),  % Breadth-first: Neighbors are prepended
+        bfs_all_shortest_paths(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, AllPaths)
     ).
 
-path_at_min_distance(AllPaths, MinDistance, Distance-_) :-
-    member(MinDistance-_, AllPaths),
+path_at_min_distance(MinDistance, Distance-_) :-
     Distance =:= MinDistance.
 
 % ------------------------------------------------------------------------------------------------
@@ -319,7 +319,8 @@ all_shortest_paths_between_two_clusters(Board, Cluster1, Cluster2, ShortestPaths
             member(E2, Cluster2),
             E1 = Row1-Col1,
             E2 = Row2-Col2,
-            shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),
+            shortest_paths_multi(Board, Col1-Row1, Col2-Row2, Distance, Path),
+            /*shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),*/
             Distance > 0
         ),
         AllPaths

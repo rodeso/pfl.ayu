@@ -26,3 +26,15 @@ display_player(Type, Player):-
     (Type = 1 -> format('Player ~d turn: ', [Player]), nl;
     Type = 2 -> (Player = 1 -> write('Player turn'), nl; write('Computer turn'), nl);
     Type = 3 -> format('Computer ~d turn: ', [Player]), nl).
+
+% Function to get the player from the type of game
+% type_to_player(+T, +CurrentPlayer, -Player)
+type_to_player(1, _, 0).
+type_to_player(2, 1, 0).
+type_to_player(2, 2, 1).
+type_to_player(3, _, 1).
+type_to_player(4, 1, 0).
+type_to_player(4, 2, 2).
+type_to_player(5, 1, 1).
+type_to_player(5, 2, 2).
+type_to_player(6, _, 2).
