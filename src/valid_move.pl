@@ -1,18 +1,12 @@
 % valid_move(+GameState, +Move)
 % Ensure that the move for an isolated piece is exactly 1 square away
-valid_move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
-
-    (piece_at(Board, FromX, FromY, CurrentPlayer) ->
-        true;
-        fail),
-
-    (empty_at(Board, ToX, ToY) ->
-        true;
-        fail),
+valid_move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)) :-
+    piece_at(Board, FromX, FromY, CurrentPlayer),
+    empty_at(Board, ToX, ToY),
     
     move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY), TempGameState),
     get_board(TempGameState, TempBoard),
-    
+
     list_cluster_elements(Board, CurrentPlayer, Count, Elements),
     find_cluster_with_element(Elements, FromX, FromY, Cluster),
     length(Cluster, ClusterSize),
@@ -25,42 +19,29 @@ valid_move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, 
 
     remove_element(FromX-FromY, Cluster, ClusterMenos),
     
-    (all_elements(ClusterMenos, ClusterTemp) ->
-        true;
-        fail),
+    check_cluster_elements(ClusterMenos, ClusterTemp),
 
-    shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths), % X-Y
+    shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths),
     filter_minimum_distance_paths(AllShortestPaths, FilteredPaths),
 
-    (path_includes_point([FilteredPaths], ToY, ToX) ->
-        true;
-        fail
-    ),
+    path_includes_point([FilteredPaths], ToY, ToX),
 
-    (ClusterSize =< ClusterSizeTemp -> 
-        true;
-        fail),
-    
-    (NumberClustersChange =< NumberClustersNoChange ->
-        true;
-        fail),
-    
-    (ClusterSize == 1 -> 
-        (valid_one_move(FromX, FromY, ToX, ToY) ->
-            true
-        ; 
-            fail 
-        );
-        true
-    ),
+    ClusterSize =< ClusterSizeTemp,
+    NumberClustersChange =< NumberClustersNoChange,
 
-    find_piece_cluster_with_spaces(Board, FromY-FromX, ClusterWithSpaces, EspaceCount), %Y-X
+    (ClusterSize == 1 -> valid_one_move(FromX, FromY, ToX, ToY) ; true),
+    
+    find_piece_cluster_with_spaces(Board, FromY-FromX, ClusterWithSpaces, EspaceCount),
     length(ClusterWithSpaces, EspaceTotalCount),
     Dif is EspaceTotalCount - EspaceCount,
 
-    ( Dif == ClusterSize -> 
-        fail;
-        true ).
+    Dif \= ClusterSize.
+
+% check_cluster_elements(+ClusterMenos, +ClusterTemp)
+% Helper Predicate for checking the cluster elements
+check_cluster_elements(ClusterMenos, ClusterTemp) :-
+    all_elements(ClusterMenos, ClusterTemp).
+
 
 % ------------------------------------------------------------------------------------------------
     
