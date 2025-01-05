@@ -38,8 +38,8 @@ choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
     FromY is S-FromYProv+1, 
     ToY is S-ToYProv+1,
 
-    valid_move_final([Board, CurrentPlayer, _], move(FromX, FromY, ToX, ToY)), 
-    !.
+    valid_move_final([Board, CurrentPlayer, _], move(FromX, FromY, ToX, ToY)), !.
+
 % Easy Computer - Level 1
 choose_move([Board, CurrentPlayer, _], 1, Move):- 
     length(Board, S),
@@ -47,8 +47,7 @@ choose_move([Board, CurrentPlayer, _], 1, Move):-
     display_game([Board, CurrentPlayer, _]), nl, nl,
     nl, write('The Computer is Thinking...'), nl, nl,
     valid_moves_final([Board, CurrentPlayer, _], ListOfMoves),
-    random_member(Move, ListOfMoves),
-    !,
+    random_member(Move, ListOfMoves), !,
     write_move(Move, S).
 
 % Hard Computer - Level 2
@@ -57,8 +56,7 @@ choose_move([Board, CurrentPlayer, _], 2, Move) :-
     display_game([Board, CurrentPlayer, _]), nl, nl,
     nl, write('The Computer is Thinking...'), nl, nl,
     valid_moves_final([Board, CurrentPlayer, _], ListOfMoves), % Get the list of moves
-    evaluate_moves([Board, CurrentPlayer, _], ListOfMoves, Move, S),
-    !.
+    evaluate_moves([Board, CurrentPlayer, _], ListOfMoves, Move, S), !.
 
 % Evaluate moves and apply cutoff for early exit
 evaluate_moves(GameState, [Move | Moves], BestMove, S) :-
@@ -85,6 +83,6 @@ max_score_moves(ScoredMoves, MaxValue, BestMoves) :-
 
 % write the move
 write_move(move(FromX, FromY, ToX, ToY), S) :-
-    newFromY is S-FromY+1,
-    newToY is S-ToY+1,
-    write('Moved piece from '), write(FromX), write(', '), write(newFromY), write(' to '), write(ToX), write(', '), write(newToY), nl.
+    NewFromY is S-FromY+1,
+    NewToY is S-ToY+1,
+    write('Moved piece from '), write(FromX), write(', '), write(NewFromY), write(' to '), write(ToX), write(', '), write(NewToY), nl.
