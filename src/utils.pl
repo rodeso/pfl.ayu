@@ -31,7 +31,7 @@ empty_at(Board, X, Y) :-
 % Checks if the pieces are the same
 same_type(Piece1, Piece2):- Piece1 == Piece2.
 
-get_board([Board, _, _], RetBoard):-
+get_board([Board, _, _, Names], RetBoard):-
     Board = RetBoard.
 
 % Get the piece at a specific cell

@@ -98,6 +98,29 @@ get_bots2_type(2, 1, T):-
 get_bots2_type(2, 2, T):-
     T is 6.
 
+% Read a line of input as an atom in SICStus
+read_line_as_atom(Atom) :-
+    read_line(Input),         % Read the line as a list of ASCII codes
+    atom_codes(Atom, Input).  % Convert the list of codes to an atom
+
+% Get player names based on game type
+get_player_names(1, [Name1, Name2]) :-  % Human vs Human
+    write('Enter name for Player 1: '), read_line_as_atom(Name1), nl,
+    write('Enter name for Player 2: '), read_line_as_atom(Name2), nl.
+
+get_player_names(2, [Name, 'Computer (Easy)']) :-  % Human vs Easy Computer
+    write('Enter name for Player 1: '), read_line_as_atom(Name), nl.
+
+get_player_names(4, [Name, 'Computer (Hard)']) :-  % Human vs Hard Computer
+    write('Enter name for Player 1: '), read_line_as_atom(Name), nl.
+
+get_player_names(3, ['Computer 1 (Easy)', 'Computer 2 (Easy)']).  % Easy vs Easy
+
+get_player_names(5, ['Computer 1 (Easy)', 'Computer 2 (Hard)']).  % Easy vs Hard
+
+get_player_names(6, ['Computer 1 (Hard)', 'Computer 2 (Hard)']).  % Hard vs Hard
+
+
 
 % Get size of the board
 % get_size_game(-S)

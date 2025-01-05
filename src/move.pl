@@ -19,7 +19,8 @@ replace_piece(Board, X, Y, NewValue, NewBoard) :-
   
 % Validates and executes a move
 % move(+GameState, +Move, -NewGameState)
-move([Board, CurrentPlayer, TypeOfGame], move(FromX, FromY, ToX, ToY), [NewBoard, CurrentPlayer, TypeOfGame]) :-
+move([Board, CurrentPlayer, TypeOfGame, Names], move(FromX, FromY, ToX, ToY), [NewBoard, CurrentPlayer, TypeOfGame, Names]) :-
     replace_piece(Board, FromX, FromY, empty, TempBoard),     % Remove the piece from the source position
     piece_player(CurrentPlayer, Piece),
     replace_piece(TempBoard, ToX, ToY, Piece, NewBoard).      % Place the piece at the destination position
+    write('Move made successfully!'), nl.
