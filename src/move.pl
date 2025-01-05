@@ -1,5 +1,6 @@
 % File of all the functions that actual move a pice
 
+% replace_row_in_board(+Y, +NewRow, +RestRows, -NewBoard)
 % Helper to replace the row at the Y-th index
 replace_row_in_board(1, NewRow, RestRows, [NewRow | RestRows]).
 replace_row_in_board(Y, NewRow, [Row | RestRows], [Row | NewBoard]) :-

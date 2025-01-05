@@ -20,7 +20,7 @@ switch_player(2, 1).
 change_player([Board, CurrentPlayer, TypeGame, Names, BoardType], [Board, NewPlayer, TypeGame, Names, BoardType]):-
     switch_player(CurrentPlayer, NewPlayer).
 
-% display_player(+Player)
+% display_player(+CurrentPlayer, +Player, +Names)
 % Displays the current player
 % Case 1: Player vs Player
 display_player(1, Player, Names) :-

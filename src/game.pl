@@ -47,7 +47,7 @@ game_loop([Board, CurrentPlayer, TypeGame, Names, BoardType]):- % Game loop - Co
 
 % ------------------------------------------------------------------------------------------------
 
-% set_up(-TypeGame, -SizeBoard, -StartingPlayer, -Names)
+% set_up(-TypeGame, -SizeBoard, -StartingPlayer, -Names, -BoardType)
 % Function to do the initial set up. The user can choose the style of the boards, the type of game, the size of the board, the starting player and the names of the players
 set_up(TypeGame, SizeBoard, StartingPlayer, Names, BoardType) :-
     get_board_type(BoardType), nl,      % Get the style of the board
@@ -66,7 +66,7 @@ initial_state([TypeGame, SizeBoard, StartingPlayer, Names, BoardType], GameState
 
 % ------------------------------------------------------------------------------------------------
 
-% play
+% play/0
 % Main function that starts the game
 play:-
     

@@ -141,30 +141,6 @@ find_neighbors_space(Board, Piece, Row, Col, Neighbors, Visited) :-
         Neighbors
     ).
 
-
-% ------------------------------------------------------------------------------------------------
-
-% shortest_path
-% Function to find the shortest path between two pieces - Distance and path
-shortest_path(Board, StartRow-StartCol, EndRow-EndCol, Distance, Paths) :-
-    bfs_shortest_paths(Board, [(StartRow-StartCol, 0, [StartRow-StartCol])], [], EndRow-EndCol, Distance, Paths).
-
-% bfs_shortest_path(+Board, +Queue, +VisitedPieces, +EndRow-EndCol, -Distance, -Paths)
-% Function to find the shortest paths between two pieces - Distance and path
-bfs_shortest_path(_, [], _, _, -1, []):- !.
-bfs_shortest_path(_, [(Row-Col, Dist, Path) | _], _, EndRow-EndCol, Distance, [FullPath]):-
-    neighbor(Row, Col, EndRow, EndCol),
-    Distance is Dist + 1,
-    reverse([EndRow-EndCol | Path], FullPath), !.
-bfs_shortest_path(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, EndRow-EndCol, Distance, Paths):-
-    find_neighbors_path(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
-    append(Queue, Neighbors, NewQueue),
-    bfs_shortest_path(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, Distance, Paths).
-bfs_shortest_path(_, [], _, _, Distance, Paths) :-
-    Distance > 0,
-    aggregate_all(set(Path), member(Path, Paths), UniquePaths),
-    reverse_all(UniquePaths, Paths).
-
 % find_neighbors_path(+Board, +Row, +Col, +Dist, +Path, +VisitedPieces, -Neighbors)
 % Find neighbors for the shortest paths
 find_neighbors_path(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors) :-
@@ -247,7 +223,6 @@ all_shortest_paths_between_two_clusters(Board, Cluster1, Cluster2, ShortestPaths
             E1 = Row1-Col1,
             E2 = Row2-Col2,
             shortest_paths(Board, Col1-Row1, Col2-Row2, Distance, Path),
-            % shortest_path(Board, Col1-Row1, Col2-Row2, Distance, Path),
             Distance > 0
         ),
         AllPaths
