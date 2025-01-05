@@ -6,7 +6,7 @@
 :- consult(end_game). % Functions to end game
 :- consult(logic).    % Functions of the game's logic
 :- consult(clusters).
-:- consult(valid_move_final).
+:- consult(valid_move).
 :- consult(utils).
 
 % ------------------------------------------------------------------------------------------------
@@ -38,8 +38,7 @@ game_loop([Board, Player, TypeGame, Names, BoardType]):- % Game loop - End of th
     format('Game over! Winner: ~s', [WinnerName]), nl.
 
 game_loop([Board, CurrentPlayer, TypeGame, Names, BoardType]):- % Game loop - Continue the game
-    valid_moves_final([Board, CurrentPlayer, TypeGame, Names, BoardType], ListOfMoves),
-    write('Valid Moves: '), write(ListOfMoves), nl,
+    valid_moves([Board, CurrentPlayer, TypeGame, Names, BoardType], ListOfMoves),
     type_to_player(TypeGame, CurrentPlayer, PlayerType),
     choose_move([Board, CurrentPlayer, TypeGame, Names, BoardType], PlayerType, Move),
     move([Board, CurrentPlayer, TypeGame, Names, BoardType], Move, NewGameState),

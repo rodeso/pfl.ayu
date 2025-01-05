@@ -22,17 +22,25 @@ change_player([Board, CurrentPlayer, TypeGame, Names, BoardType], [Board, NewPla
 
 % display_player(+Player)
 % Displays the current player
-display_player(Type, Player, Names):-
-    (Type = 1 -> 
-        nth1(Player, Names, Name), % Get the player's name from the list
-        format('~w\'s turn: ', [Name]), nl;
-    Type = 2 -> 
-        (Player = 1 -> 
-            nth1(1, Names, Name), % Get the human player's name
-            format('~w\'s turn: ', [Name]), nl;
-            write('Computer turn'), nl);
-    Type = 3 -> 
-        format('Computer ~d turn: ', [Player]), nl).
+% Case 1: Player vs Player
+display_player(1, Player, Names) :-
+    nth1(Player, Names, Name),
+    format('~w\'s turn: ', [Name]), nl.
+
+% Case 2: Player vs Computer, Human's turn
+display_player(2, 1, Names) :-
+    nth1(1, Names, Name),
+    format('~w\'s turn: ', [Name]), nl.
+
+% Case 2: Player vs Computer, Computer's turn
+display_player(2, Player, _) :-
+    Player \= 1,
+    write('Computer turn'), nl.
+
+% Case 3: Computer vs Computer
+display_player(3, Player, _) :-
+    format('Computer ~d turn: ', [Player]), nl.
+
 
 
 % Function to get the player from the type of game

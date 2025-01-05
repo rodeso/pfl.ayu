@@ -1,6 +1,6 @@
-% valid_move_final(+GameState, +Move)
+% valid_move(+GameState, +Move)
 % Ensure that the move for an isolated piece is exactly 1 square away
-valid_move_final([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
+valid_move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
 
     % Validate the source position
     (piece_at(Board, FromX, FromY, CurrentPlayer) ->
@@ -73,9 +73,9 @@ valid_move_final([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY,
 
 % ------------------------------------------------------------------------------------------------
 
-% valid_move_final_no_errors(+GameState, +Move)
-% Same as valid_move_final, but without the error messages
-valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
+% valid_move_no_errors(+GameState, +Move)
+% Same as valid_move, but without the error messages
+valid_move_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
 
     (piece_at(Board, FromX, FromY, CurrentPlayer) ->
         true;
@@ -141,7 +141,7 @@ valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(Fro
     
 % valid_moves(+GameState, -ListOfMoves)
 % Generates a list of all possible valid moves for the CurrentPlayer on the Board
-valid_moves_final([Board, CurrentPlayer, T, Names, BoardType], UniqueListOfMoves) :-
+valid_moves([Board, CurrentPlayer, T, Names, BoardType], UniqueListOfMoves) :-
     length(Board, Size),
     findall(move(FromX, FromY, ToX, ToY),
         (
@@ -152,7 +152,7 @@ valid_moves_final([Board, CurrentPlayer, T, Names, BoardType], UniqueListOfMoves
             between(1, Size, ToY),
             (FromX \= ToX; FromY \= ToY),
             empty_at(Board, ToX, ToY),
-            valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY))
+            valid_move_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY))
         ),
         ListOfMoves),
     sort(ListOfMoves, UniqueListOfMoves).
@@ -171,4 +171,4 @@ valid_moves_bool([Board, CurrentPlayer, T, Names, BoardType]) :-
     between(1, Size, ToY),
     (FromX \= ToX; FromY \= ToY),
     empty_at(Board, ToX, ToY),
-    valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)), !.
+    valid_move_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)), !.

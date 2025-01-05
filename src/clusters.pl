@@ -203,7 +203,7 @@ bfs_all_shortest_paths(Board, [(Row-Col, Dist, Path) | Queue], VisitedPieces, En
         AllPaths = [NewDist-[EndRow-EndCol|Path]|RestPaths],
         bfs_all_shortest_paths(Board, Queue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, RestPaths)
     ;
-        find_neighbors_paths(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
+        find_neighbors_path(Board, Row, Col, Dist, Path, VisitedPieces, Neighbors),
         append(Neighbors, Queue, NewQueue),  % Breadth-first: Neighbors are prepended
         bfs_all_shortest_paths(Board, NewQueue, [(Row-Col, Dist) | VisitedPieces], EndRow-EndCol, AllPaths)
     ).
