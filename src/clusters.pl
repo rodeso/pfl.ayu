@@ -3,36 +3,7 @@
 :- dynamic visited/2.
 
 % ------------------------------------------------------------------------------------------------
-
-% Entry point to count clusters for a player
-count_clusters(Board, Player, Count) :-
-    piece_player(Player, Piece),
-    findall(Row-Col, (nth1(Row, Board, RowList), nth1(Col, RowList, Piece)), AllPieces),
-    count_clusters_aux(Board, Piece, AllPieces, [], 0, Count).
-
-% Helper to traverse all pieces
-count_clusters_aux(_, _, [], _, Count, Count).
-count_clusters_aux(Board, Piece, [Row-Col | Rest], Visited, Acc, Count) :-
-    (member(Row-Col, Visited) ->
-        % If already visited, skip
-        count_clusters_aux(Board, Piece, Rest, Visited, Acc, Count)
-    ;
-        % Start BFS for a new cluster
-        bfs(Board, Piece, [Row-Col], [], NewVisited),
-        NewAcc is Acc + 1,
-        count_clusters_aux(Board, Piece, Rest, NewVisited, NewAcc, Count)
-    ).
-
-% BFS implementation
-bfs(_, _, [], Visited, Visited).
-bfs(Board, Piece, [Row-Col | Queue], Visited, FinalVisited) :-
-    (member(Row-Col, Visited) ->
-        bfs(Board, Piece, Queue, Visited, FinalVisited)
-    ;
-        find_neighbors(Board, Piece, Row, Col, Neighbors, Visited),
-        append(Queue, Neighbors, NewQueue),
-        bfs(Board, Piece, NewQueue, [Row-Col | Visited], FinalVisited)
-    ).
+% General functions
 
 % Find valid neighbors for BFS
 find_neighbors(Board, Piece, Row, Col, Neighbors, Visited) :-
@@ -62,19 +33,19 @@ list_clusters_with_elements(Board, Player, Sizes, Elements) :-
     findall(Row-Col, (nth1(Row, Board, RowList), nth1(Col, RowList, Piece)), AllPieces),
     list_clusters_with_elements_aux(Board, Piece, AllPieces, [], [], [], Sizes, Elements).
 
-% Helper to traverse all pieces and list sizes and elements
-list_clusters_with_elements_aux(_, _, [], _, AccSizes, AccElements, AccSizes, AccElements).
+list_clusters_with_elements_aux(_, _, [], Visited, AccSizes, AccElements, AccSizes, AccElements).
 list_clusters_with_elements_aux(Board, Piece, [Row-Col | Rest], Visited, AccSizes, AccElements, Sizes, Elements) :-
     (member(Row-Col, Visited) ->
         % If already visited, skip
         list_clusters_with_elements_aux(Board, Piece, Rest, Visited, AccSizes, AccElements, Sizes, Elements)
     ;
         % Start BFS for a new cluster, count its size, and collect its elements
-        bfs_size_and_elements(Board, Piece, [Row-Col], [], 0, Size, [], ClusterElements, NewVisited),
-        list_clusters_with_elements_aux(Board, Piece, Rest, NewVisited, [Size|AccSizes], [ClusterElements|AccElements], Sizes, Elements)
+        bfs_size_and_elements(Board, Piece, [Row-Col], Visited, 0, Size, [], ClusterElements, NewVisited),
+        % Sort cluster elements for consistent ordering
+        sort(ClusterElements, SortedClusterElements),
+        list_clusters_with_elements_aux(Board, Piece, Rest, NewVisited, [Size|AccSizes], [SortedClusterElements|AccElements], Sizes, Elements)
     ).
 
-% BFS implementation that calculates cluster size and collects elements
 bfs_size_and_elements(_, _, [], Visited, Size, Size, Cluster, Cluster, Visited).
 bfs_size_and_elements(Board, Piece, [Row-Col | Queue], Visited, AccSize, Size, AccCluster, Cluster, FinalVisited) :-
     (member(Row-Col, Visited) ->
@@ -275,7 +246,7 @@ shortest_paths_between_clusters(Board, FromX, FromY, Elements, AllShortestPaths)
 
     Cluster = [FirstElement|_],
     exclude(has_element(FirstElement), Elements, OtherClusters),          % Take out the cluster
-    
+
     find_shortest_paths_for_all_clusters(Board, Cluster, OtherClusters, [], AllShortestPaths).
 
 % Helper function to find the shortest paths between Cluster and all other clusters

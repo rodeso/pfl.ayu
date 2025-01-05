@@ -17,7 +17,7 @@
 % display_game(+GameState)
 % Displays the current board and the current player
 display_game([Board, CurrentPlayer, T]):-
-    display_board(Board), nl,
+    display_general_board(Board, 2) , nl,
     display_player(T, CurrentPlayer).
 
 
@@ -25,7 +25,7 @@ display_game([Board, CurrentPlayer, T]):-
 % This is the main game loop
 game_loop([Board, Player, T]):- % If the game is over
     game_over([Board, Player, T], Winner), !,
-    display_board(Board),
+    display_general_board(Board, 2),
     format('Game over! Winner: ~d', [Winner]), !.
 game_loop([Board, CurrentPlayer, T]):-
 

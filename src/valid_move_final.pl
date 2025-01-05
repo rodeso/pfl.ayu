@@ -13,23 +13,20 @@ valid_move_final([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)):-
         write('Error: Destination position is not empty.'), nl, nl, fail),
 
 
-    count_clusters(Board, CurrentPlayer, CountNoChange),                          % Count the clusters
-    
     move([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY), TempGameState), % Do the move in the temp board
     get_board(TempGameState, TempBoard),
-    count_clusters(TempBoard, CurrentPlayer, CountChange),                        % Count the clusters WITH the change
-    
-    
+
     final_cluster_elements(Board, CurrentPlayer, Count, Elements),                % Find all the clusters
     find_cluster_with_element(Elements, FromX, FromY, Cluster),                   % Find the cluster that contains the piece
-    length(Cluster, ClusterSize),
+    length(Cluster, ClusterSize),                                                 % Size of the cluster before the move
+    length(Count, NumberClustersNoChange),                                        % Number of clusters before the move
 
     final_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),    % Find all the clusters WITH the change
     find_cluster_with_element(ElementsTemp, ToX, ToY, ClusterTemp),               % Find the cluster that contains the piece WITH the change
-    length(ClusterTemp, ClusterSizeTemp),
+    length(ClusterTemp, ClusterSizeTemp),                                         % Size of the cluster after the move
+    length(CountTemp, NumberClustersChange),                                      % Number of clusters after the move
 
-    
-    remove_element(FromX-FromY, Cluster, ClusterMenos),
+    remove_element(FromX-FromY, Cluster, ClusterMenos), % Remove the element from the cluster
     
     % Ensure that all the elements from the initial cluster are in the changed cluster (except the position we are changing)
     (all_elements(ClusterMenos, ClusterTemp) ->
@@ -50,7 +47,7 @@ valid_move_final([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)):-
         write('Error: Clusters can never decrease size.'), nl, nl, fail),
 
     % Ensure after that the list of clusters is smaller or the same size
-    (CountChange =< CountNoChange -> % AUMENTA O NUMERO DE ALGOMERADOS É PROIBIDO
+    (NumberClustersChange =< NumberClustersNoChange -> % AUMENTA O NUMERO DE ALGOMERADOS É PROIBIDO
         true;
         write('Error: This move separates a cluster.'), nl, nl, fail),
     
@@ -86,22 +83,19 @@ valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, To
     (empty_at(Board, ToX, ToY) ->
         true;
         fail),
-
-
-    count_clusters(Board, CurrentPlayer, CountNoChange),
     
     move([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY), TempGameState),
     get_board(TempGameState, TempBoard),
-    count_clusters(TempBoard, CurrentPlayer, CountChange),
-    
     
     final_cluster_elements(Board, CurrentPlayer, Count, Elements),
     find_cluster_with_element(Elements, FromX, FromY, Cluster),
     length(Cluster, ClusterSize),
+    length(Count, NumberClustersNoChange),
 
     final_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),
     find_cluster_with_element(ElementsTemp, ToX, ToY, ClusterTemp),
     length(ClusterTemp, ClusterSizeTemp),
+    length(CountTemp, NumberClustersChange),  
 
     remove_element(FromX-FromY, Cluster, ClusterMenos),
     
@@ -120,11 +114,11 @@ valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, To
     (ClusterSize =< ClusterSizeTemp -> 
         true;
         fail),
-    (CountChange =< CountNoChange ->
+    
+    (NumberClustersChange =< NumberClustersNoChange ->
         true;
         fail),
     
-
     (ClusterSize == 1 -> 
         (valid_one_move(FromX, FromY, ToX, ToY) ->
             true
@@ -138,14 +132,9 @@ valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, To
     length(ClusterWithSpaces, EspaceTotalCount),
     Dif is EspaceTotalCount - EspaceCount,
 
-    (ClusterSize == 1 ->
-        ( Dif == 1 ->
-            fail
-        ;
-            true 
-        );
-        true
-    ).
+    ( Dif == ClusterSize -> 
+        fail;
+        true ).
 
 % ------------------------------------------------------------------------------------------------
     
@@ -181,8 +170,7 @@ valid_moves_bool([Board, CurrentPlayer, T]) :-
     between(1, Size, ToY),
     (FromX \= ToX; FromY \= ToY),
     empty_at(Board, ToX, ToY),
-    valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)),
-    !.
+    valid_move_final_no_errors([Board, CurrentPlayer, T], move(FromX, FromY, ToX, ToY)), !.
 
 
 
