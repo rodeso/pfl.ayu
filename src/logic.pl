@@ -6,6 +6,19 @@
     % Level 1 should return a random valid move. 
     % Level 2 should return the best play at the time (using a greedy algorithm), considering the evaluation of the game state as determined by the value/3 predicate. 
     % For human players, it should interact with the user to read the move.
+
+
+
+% value(+GameState, +Player, -Value)
+% OBRIGATORIO
+% Predicate to evaluate the value of a game state for a given player
+value([Board, CurrentPlayer, _], Player, Value) :-
+    switch_player(Player, Opponent),                % Get the opponent player
+    valid_moves_final([Board, Opponent, _], OpponentMoves), % Get valid moves for the opponent
+    length(OpponentMoves, OpponentMoveCount),       % Count opponent moves
+    Value is OpponentMoveCount.            % Calculate the value
+
+
 % choose_move(+GameState, +Level, -Move)
 % OBRIGATORIO
 % Predicate to choose a move for a human player
@@ -27,7 +40,7 @@ choose_move([Board, CurrentPlayer, _], 0, move(FromX, FromY, ToX, ToY)) :-
 
     valid_move_final([Board, CurrentPlayer, _], move(FromX, FromY, ToX, ToY)), 
     !.
-% Easy Computer
+% Easy Computer - Level 1
 choose_move([Board, CurrentPlayer, _], 1, Move):- 
     length(Board, S),
     repeat,
@@ -35,49 +48,43 @@ choose_move([Board, CurrentPlayer, _], 1, Move):-
     nl, write('The Computer is Thinking...'), nl, nl,
     valid_moves_final([Board, CurrentPlayer, _], ListOfMoves),
     random_member(Move, ListOfMoves),
-    !.
+    !,
+    write_move(Move, S).
 
-% Hard Computer
-choose_move([Board, CurrentPlayer, _], 2, Move):-
+% Hard Computer - Level 2
+choose_move([Board, CurrentPlayer, _], 2, Move) :-
     length(Board, S),
-    repeat,
     display_game([Board, CurrentPlayer, _]), nl, nl,
     nl, write('The Computer is Thinking...'), nl, nl,
     valid_moves_final([Board, CurrentPlayer, _], ListOfMoves), % Get the list of moves
-    hard_bot([Board, CurrentPlayer, _], ListOfMoves, ListOfBestMoves),
-    random_member(Move, ListOfBestMoves),
+    evaluate_moves([Board, CurrentPlayer, _], ListOfMoves, Move, S),
     !.
 
-% Go through all the moves (ListOfMoves) possible boards
-    % see valid_moves para o oponente
-    % selecionar apenas os que tem o maior numero de moves para o oponente
-% hard_bot(GameState, ListOfMoves, ListOfBestMoves)
-% This function evaluates all possible moves for the current player and chooses the ones that minimize the opponent's valid moves.
-hard_bot([Board, CurrentPlayer, _], ListOfMoves, ListOfBestMoves) :-
-    % Get the opponent player
-    switch_player(CurrentPlayer, Opponent),
-    
-    % Evaluate each move in ListOfMoves, generating a score based on the number of valid moves the opponent has
-    findall(Score-Move, (
-        member(Move, ListOfMoves),                                 % For each move
-        move([Board, CurrentPlayer, _], Move, TempGameState),      % Simulate the move
-        change_player(TempGameState, OpponentGameState),
-        valid_moves_final(OpponentGameState, OpponentMoves),           % Find valid moves for the opponent on the new board
-        length(OpponentMoves, Score)                               % The score is the number of opponent moves (fewer is better)
-    ), ScoredMoves),
+% Evaluate moves and apply cutoff for early exit
+evaluate_moves(GameState, [Move | Moves], BestMove, S) :-
+    move(GameState, Move, TempGameState),        % Simulate the move
+    value(TempGameState, CurrentPlayer, Value),  % Evaluate the move
+    Cutoff is 12,                                % Define the cutoff
+    nl, write('Evaluating move: '), write(Move), write(' -> Value: '), write(Value), nl,
+    (Value > Cutoff ->
+        nl, write('Great move found, executing immediately: '), write(Move), nl,
+        BestMove = Move                          % Early exit if the move is great
+    ;
+        evaluate_moves(GameState, Moves, BestMove, S) % Otherwise, keep looking
+    ).
+evaluate_moves(_, [], BestMove, S) :- 
+    nl, write('No move exceeded cutoff, choosing the best available.'), nl,
+    fail. % This ensures we fall back to the max score logic if needed
 
-    % Find the minimum score
-    min_score_moves(ScoredMoves, MinScore, ListOfBestMoves),
-    !.
+% Finds the moves with the maximum score
+max_score_moves(ScoredMoves, MaxValue, BestMoves) :-
+    % Find the maximum value
+    max_member(MaxValue-_, ScoredMoves),
+    % Collect all moves with this maximum value
+    findall(Move, member(MaxValue-Move, ScoredMoves), BestMoves).
 
-% min_score_moves(ScoredMoves, MinScore, BestMoves)
-% This helper function finds the moves with the minimum score from the list of scored moves.
-min_score_moves(ScoredMoves, MinScore, BestMoves) :-
-    % Find the minimum score
-    min_member(MinScore-_, ScoredMoves),
-
-    % Collect all moves with this minimum score
-    findall(Move, member(MinScore-Move, ScoredMoves), BestMoves).
-
-
-
+% write the move
+write_move(move(FromX, FromY, ToX, ToY), S) :-
+    newFromY is S-FromY+1,
+    newToY is S-ToY+1,
+    write('Moved piece from '), write(FromX), write(', '), write(newFromY), write(' to '), write(ToX), write(', '), write(newToY), nl.
