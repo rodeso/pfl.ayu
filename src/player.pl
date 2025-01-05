@@ -32,15 +32,6 @@ display_player(2, 1, Names) :-
     nth1(1, Names, Name),
     format('~w\'s turn: ', [Name]), nl.
 
-% Case 2: Player vs Computer, Computer's turn
-display_player(2, Player, _) :-
-    Player \= 1,
-    write('Computer turn'), nl.
-
-% Case 3: Computer vs Computer
-display_player(3, Player, _) :-
-    format('Computer ~d turn: ', [Player]), nl.
-
 
 
 % Function to get the player from the type of game

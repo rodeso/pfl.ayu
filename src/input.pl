@@ -79,8 +79,8 @@ get_bot_difficulty(TypeGame):-
     write('1 - Easy'), nl,
     write('2 - Hard'), nl,
     get_number(1, 2, 'Bot difficulty', Difficulty),
-    T is 2 * Difficulty.
-get_bots_difficulty(T):-
+    TypeGame is 2 * Difficulty.
+get_bots_difficulty(TypeGame):-
     write('Bot 1 difficulty: '), nl,
     write('1 - Easy'), nl,
     write('2 - Hard'), nl,
@@ -89,7 +89,7 @@ get_bots_difficulty(T):-
     write('1 - Easy'), nl,
     write('2 - Hard'), nl,
     get_number(1, 2, 'Bot 2 difficulty', Difficulty2),
-    get_bots2_type(Difficulty1, Difficulty2, T).
+    get_bots2_type(Difficulty1, Difficulty2, TypeGame).
 
 % get_bots2_type(+Difficulty1, +Difficulty2, -TypeGame)
 % Get bot type
