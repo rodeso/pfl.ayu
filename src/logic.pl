@@ -55,7 +55,6 @@ choose_move([Board, CurrentPlayer, _, Names, BoardType], 2, Move) :-
     display_game([Board, CurrentPlayer, _, Names, BoardType]), nl, nl,
     write('The Computer is Thinking...'), nl, nl,
     valid_moves([Board, CurrentPlayer, _, Names, BoardType], ListOfMoves), % Get the list of moves
-    write('Evaluating moves...'), nl, nl,
     evaluate_moves_with_cutoff([Board, CurrentPlayer, _, Names, BoardType], ListOfMoves, S, EvaluatedMoves),
     % Select the move with the highest value from the evaluated moves
     EvaluatedMoves = [BestMove | _],
@@ -85,7 +84,6 @@ evaluate_based_on_cutoff(GameState, Moves, Value, Cutoff, Limit, EvaluatedMoves)
     collect_and_evaluate_limited_moves(GameState, Moves, Limit, EvaluatedMoves).
 evaluate_based_on_cutoff(GameState, Moves, _, _, _, EvaluatedMoves) :-
     % Evaluate all moves
-    write('Cutoff not reached'), nl,
     collect_and_evaluate_limited_moves(GameState, Moves, inf, EvaluatedMoves).
 
 % collect_and_evaluate_limited_moves(+GameState, +Moves, +Limit, -EvaluatedMoves)
@@ -107,7 +105,7 @@ evaluate_moves(GameState, Moves, EvaluatedMoves) :-
     findall(Value-Move, (
         member(Move, Moves),
         move(GameState, Move, TempGameState),
-        write('Evaluating moves ...'), nl,
+        write('Evaluating moves ...'), nl, nl,
         value(TempGameState, CurrentPlayer, Value)
     ), EvaluatedMoves).
 
@@ -133,11 +131,7 @@ get_cutoff_from_size(15, 8).
 % Get the limit based on the value
 get_limit(Value, S, Limit) :-
     TempLimit is Value // S // 3,  % Perform the initial calculation
-    (TempLimit < 1 -> Limit = 1; Limit = TempLimit), % Ensure the limit is at least 1
-    write('Value: '), write(Value), 
-    write(' S: '), write(S), 
-    write(' Limit: '), write(Limit), nl.
-
+    (TempLimit < 1 -> Limit = 1; Limit = TempLimit). % Ensure the limit is at least 1
 
 % -----------------------------------------------------
 
