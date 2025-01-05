@@ -16,11 +16,9 @@ replace_piece(Board, X, Y, NewValue, NewBoard) :-
     replace_row_in_board(Y, NewRow, RestRows, NewBoard).      % Ensure the row is correctly replaced in the board
 
 
-  
+% move(+GameState, +Move, -NewGameState)~
 % Validates and executes a move
-% move(+GameState, +Move, -NewGameState)
-move([Board, CurrentPlayer, TypeOfGame, Names], move(FromX, FromY, ToX, ToY), [NewBoard, CurrentPlayer, TypeOfGame, Names]) :-
+move([Board, CurrentPlayer, TypeOfGame, Names, BoardType], move(FromX, FromY, ToX, ToY), [NewBoard, CurrentPlayer, TypeOfGame, Names, BoardType]) :-
     replace_piece(Board, FromX, FromY, empty, TempBoard),     % Remove the piece from the source position
     piece_player(CurrentPlayer, Piece),
     replace_piece(TempBoard, ToX, ToY, Piece, NewBoard).      % Place the piece at the destination position
-    write('Move made successfully!'), nl.

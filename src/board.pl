@@ -3,7 +3,13 @@
 % ------------------------------------------------------------------------------------------------
 % Boards
 
+% 3x3 board to show the style examples
+board_styles(3, [[empty, x, empty], 
+          [o, empty, o], 
+          [empty, x, empty]]).
+
 % 5x5 board
+% board(+Size, -Board)
 board(5, [[empty, x, empty, x, empty], 
           [o, empty, o, empty, o], 
           [empty, x, empty, x, empty], 
@@ -114,6 +120,7 @@ char(x, 'X').
 char(o, 'O').
 char(empty, ' ').
 
+% display_item(+Item)
 % Displays an item
 display_item(Item):- 
     char(Item, C),
@@ -190,18 +197,21 @@ char_2(x, 'X').
 char_2(o, 'O').
 char_2(empty, '+').
 
+% display_cell_content_2(+Item)
 % Displays the cell content
 display_cell_content_2(Item):-
     char_2(Item, Char),
     write(Char).
 
+% display_empty_row_2(+Row, +Value)
 % Displays empty row spacing
 display_empty_row_2([], _):- nl, !.
 display_empty_row_2([_ | Rest], []):- !.
-display_empty_row_2([_ | Rest], V):-
+display_empty_row_2([_ | Rest], Value):-
     write('|   '),
-    display_empty_row_2(Rest, V).
+    display_empty_row_2(Rest, Value).
 
+% display_row_with_borders_2(+Row, +NumberRows)
 % Displays a row with borders
 display_row_with_borders_2([], _):-
     write(''), nl.
@@ -214,10 +224,12 @@ display_row_with_borders_2([Item | Rest], NumberRows):-
     NumberRows1 is NumberRows - 1,
     display_row_with_borders_2(Rest, NumberRows1).
 
+% write_row_number_2(+RowNumber)
 % Writes the row number
 write_row_number_2(RowNumber):-
     format('~|~t~d~2+  ', [RowNumber]).
 
+% display_full_board_2(+Board, +CurrentRow, +TotalRows)
 % Displays the full board including rows and dividers
 display_full_board_2([], _, _):- !.
 display_full_board_2([Row | Rest], CurrentRow, TotalRows):-
@@ -229,6 +241,7 @@ display_full_board_2([Row | Rest], CurrentRow, TotalRows):-
     NextRow is CurrentRow - 1,
     display_full_board_2(Rest, NextRow, TotalRows).
 
+% display_column_number_2(+N, +Current)
 % Displays the column numbers at the bottom
 display_column_number_2(N, N):-
     write(N), !.
@@ -242,6 +255,7 @@ display_column_number_2(N, Current):-
     Next is Current + 1,
     display_column_number_2(N, Next).
 
+% display_board_2(+Board)
 % Displays the whole board in another style
 display_board_2(Board):-
     length(Board, N),

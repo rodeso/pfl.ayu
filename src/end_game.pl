@@ -2,5 +2,5 @@
 
 % game_over(+GameState, -Winner)
 % This functions determines if the current player won or not
-game_over([Board, CurrentPlayer, T, Names], CurrentPlayer):-
-    \+ valid_moves_bool([Board, CurrentPlayer, T, Names]).
+game_over([Board, CurrentPlayer, T, Names, BoardType], CurrentPlayer):-
+    \+ valid_moves_bool([Board, CurrentPlayer, T, Names, BoardType]).

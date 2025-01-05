@@ -17,7 +17,7 @@ switch_player(2, 1).
 
 % change_player(+GameState, +NewGameState)
 % Switch the player inside of the GameState
-change_player([B, CurrentPlayer, T, Names], [B, NewPlayer, T, Names]):-
+change_player([Board, CurrentPlayer, TypeGame, Names, BoardType], [Board, NewPlayer, TypeGame, Names, BoardType]):-
     switch_player(CurrentPlayer, NewPlayer).
 
 % display_player(+Player)

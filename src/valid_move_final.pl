@@ -1,6 +1,6 @@
-% valid_one_move(FromX, FromY, ToX, ToY)
+% valid_move_final(+GameState, +Move)
 % Ensure that the move for an isolated piece is exactly 1 square away
-valid_move_final([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY)):-
+valid_move_final([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
 
     % Validate the source position
     (piece_at(Board, FromX, FromY, CurrentPlayer) ->
@@ -13,15 +13,15 @@ valid_move_final([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY))
         write('Error: Destination position is not empty.'), nl, nl, fail),
 
 
-    move([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY), TempGameState), % Do the move in the temp board
+    move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY), TempGameState), % Do the move in the temp board
     get_board(TempGameState, TempBoard),
 
-    final_cluster_elements(Board, CurrentPlayer, Count, Elements),                % Find all the clusters
+    list_cluster_elements(Board, CurrentPlayer, Count, Elements),                % Find all the clusters
     find_cluster_with_element(Elements, FromX, FromY, Cluster),                   % Find the cluster that contains the piece
     length(Cluster, ClusterSize),                                                 % Size of the cluster before the move
     length(Count, NumberClustersNoChange),                                        % Number of clusters before the move
 
-    final_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),    % Find all the clusters WITH the change
+    list_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),    % Find all the clusters WITH the change
     find_cluster_with_element(ElementsTemp, ToX, ToY, ClusterTemp),               % Find the cluster that contains the piece WITH the change
     length(ClusterTemp, ClusterSizeTemp),                                         % Size of the cluster after the move
     length(CountTemp, NumberClustersChange),                                      % Number of clusters after the move
@@ -73,8 +73,9 @@ valid_move_final([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY))
 
 % ------------------------------------------------------------------------------------------------
 
+% valid_move_final_no_errors(+GameState, +Move)
 % Same as valid_move_final, but without the error messages
-valid_move_final_no_errors([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY)):-
+valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)):-
 
     (piece_at(Board, FromX, FromY, CurrentPlayer) ->
         true;
@@ -84,15 +85,15 @@ valid_move_final_no_errors([Board, CurrentPlayer, T, Names], move(FromX, FromY, 
         true;
         fail),
     
-    move([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY), TempGameState),
+    move([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY), TempGameState),
     get_board(TempGameState, TempBoard),
     
-    final_cluster_elements(Board, CurrentPlayer, Count, Elements),
+    list_cluster_elements(Board, CurrentPlayer, Count, Elements),
     find_cluster_with_element(Elements, FromX, FromY, Cluster),
     length(Cluster, ClusterSize),
     length(Count, NumberClustersNoChange),
 
-    final_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),
+    list_cluster_elements(TempBoard, CurrentPlayer, CountTemp, ElementsTemp),
     find_cluster_with_element(ElementsTemp, ToX, ToY, ClusterTemp),
     length(ClusterTemp, ClusterSizeTemp),
     length(CountTemp, NumberClustersChange),  
@@ -138,9 +139,9 @@ valid_move_final_no_errors([Board, CurrentPlayer, T, Names], move(FromX, FromY, 
 
 % ------------------------------------------------------------------------------------------------
     
-% valid_moves([Board, CurrentPlayer, _], ListOfMoves)
+% valid_moves(+GameState, -ListOfMoves)
 % Generates a list of all possible valid moves for the CurrentPlayer on the Board
-valid_moves_final([Board, CurrentPlayer, T, Names], UniqueListOfMoves) :-
+valid_moves_final([Board, CurrentPlayer, T, Names, BoardType], UniqueListOfMoves) :-
     length(Board, Size),
     findall(move(FromX, FromY, ToX, ToY),
         (
@@ -151,17 +152,17 @@ valid_moves_final([Board, CurrentPlayer, T, Names], UniqueListOfMoves) :-
             between(1, Size, ToY),
             (FromX \= ToX; FromY \= ToY),
             empty_at(Board, ToX, ToY),
-            valid_move_final_no_errors([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY))
+            valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY))
         ),
         ListOfMoves),
     sort(ListOfMoves, UniqueListOfMoves).
 
 % ------------------------------------------------------------------------------------------------
 
-% valid_moves_bool([Board, CurrentPlayer, _], ListOfMoves)
+% valid_moves_bool(+GameState)
 % Returns true if there is at least one valid move for the CurrentPlayer on the Board
 % Used to check if the game is over
-valid_moves_bool([Board, CurrentPlayer, T, Names]) :-
+valid_moves_bool([Board, CurrentPlayer, T, Names, BoardType]) :-
     length(Board, Size),
     between(1, Size, FromX),
     between(1, Size, FromY),
@@ -170,8 +171,4 @@ valid_moves_bool([Board, CurrentPlayer, T, Names]) :-
     between(1, Size, ToY),
     (FromX \= ToX; FromY \= ToY),
     empty_at(Board, ToX, ToY),
-    valid_move_final_no_errors([Board, CurrentPlayer, T, Names], move(FromX, FromY, ToX, ToY)), !.
-
-
-
-    
+    valid_move_final_no_errors([Board, CurrentPlayer, T, Names, BoardType], move(FromX, FromY, ToX, ToY)), !.
