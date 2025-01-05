@@ -68,12 +68,12 @@ choose_move([Board, CurrentPlayer, _, Names, BoardType], 2, Move) :-
 % Evaluate moves with cutoff logic
 % evaluate_moves_with_cutoff(+GameState, +Moves, +S, -OrderedMoves)
 % Evaluate moves with cutoff logic
-evaluate_moves_with_cutoff(GameState, [FirstMove | RemainingMoves], S, OrderedMoves) :-
-    move(GameState, FirstMove, TempGameState),           % Simulate the first move
+evaluate_moves_with_cutoff([Board, CurrentPlayer, TypeGame, Names, BoardType], [FirstMove | RemainingMoves], S, OrderedMoves) :-
+    move([Board, CurrentPlayer, TypeGame, Names, BoardType], FirstMove, TempGameState),           % Simulate the first move
     value(TempGameState, CurrentPlayer, Value),          % Evaluate the first move
     get_cutoff_from_size(S, Cutoff),                     % Get the cutoff value based on the board size
     get_limit(Value, S, Limit),                          % Get the limit based on the value
-    evaluate_based_on_cutoff(GameState, [FirstMove | RemainingMoves], Value, Cutoff, Limit, EvaluatedMoves),
+    evaluate_based_on_cutoff([Board, CurrentPlayer, TypeGame, Names, BoardType], [FirstMove | RemainingMoves], Value, Cutoff, Limit, EvaluatedMoves),
     order_moves_by_value(EvaluatedMoves, OrderedMoves).  % Order the moves by value
 
 % evaluate_based_on_cutoff(+GameState, +Moves, +Value, +Cutoff, +Limit, -EvaluatedMoves)

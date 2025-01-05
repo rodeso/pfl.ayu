@@ -38,7 +38,6 @@ game_loop([Board, Player, TypeGame, Names, BoardType]):- % Game loop - End of th
     format('Game over! Winner: ~s', [WinnerName]), nl.
 
 game_loop([Board, CurrentPlayer, TypeGame, Names, BoardType]):- % Game loop - Continue the game
-    valid_moves([Board, CurrentPlayer, TypeGame, Names, BoardType], ListOfMoves),
     type_to_player(TypeGame, CurrentPlayer, PlayerType),
     choose_move([Board, CurrentPlayer, TypeGame, Names, BoardType], PlayerType, Move),
     move([Board, CurrentPlayer, TypeGame, Names, BoardType], Move, NewGameState),
