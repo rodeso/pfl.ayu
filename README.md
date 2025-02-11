@@ -10,7 +10,7 @@ AYU
 - **Tools:** Prolog
 - **Institution:** [FEUP](https://sigarra.up.pt/feup/en/web_page.Inicial)
 - **Course:** [PFL](https://sigarra.up.pt/feup/en/ucurr_geral.ficha_uc_view?pv_ocorrencia_id=541889) (Functional and Logic Programming)
-- **Project grade:** TBD
+- **Project grade:** 18.5
 - **Group members:**
     - Leonor Couto (up202205796@fe.up.pt) 50%
     - Rodrigo de Sousa (up202205751@fe.up.pt) 50%
